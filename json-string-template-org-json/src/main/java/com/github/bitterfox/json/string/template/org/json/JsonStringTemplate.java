@@ -24,7 +24,7 @@ package com.github.bitterfox.json.string.template.org.json;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 public class JsonStringTemplate {
     private static final JsonStringTemplateProcessor<Object> JSON =

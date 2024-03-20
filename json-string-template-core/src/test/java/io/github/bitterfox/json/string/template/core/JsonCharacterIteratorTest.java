@@ -19,7 +19,7 @@
  *
  */
 
-package io.github.bitterfox.json.string.template.base;
+package io.github.bitterfox.json.string.template.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
 
 class JsonCharacterIteratorTest {
     public StringTemplate.Processor<List<JsonCharacter>, RuntimeException> JC =

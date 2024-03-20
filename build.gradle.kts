@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization
+import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
+
 plugins {
     id("java")
 }

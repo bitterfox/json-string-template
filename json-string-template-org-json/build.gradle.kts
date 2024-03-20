@@ -1,4 +1,4 @@
 dependencies {
-    implementation(project(":json-string-template-base"))
+    implementation(project(":json-string-template-core"))
     implementation("org.json:json:20240303")
 }

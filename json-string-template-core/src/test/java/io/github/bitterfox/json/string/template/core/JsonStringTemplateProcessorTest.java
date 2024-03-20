@@ -19,7 +19,7 @@
  *
  */
 
-package io.github.bitterfox.json.string.template.base;
+package io.github.bitterfox.json.string.template.core;
 
 import static org.junit.jupiter.api.Assertions.*;
 

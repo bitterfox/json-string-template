@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.github.bitterfox.json.string.template.base.JsonBridge;
+import io.github.bitterfox.json.string.template.core.JsonBridge;
 
 public class JacksonJsonBridge implements JsonBridge<JsonNode> {
     private final ObjectMapper mapper;

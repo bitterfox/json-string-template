@@ -19,14 +19,14 @@
  *
  */
 
-package io.github.bitterfox.json.string.template.base;
+package io.github.bitterfox.json.string.template.core;
 
 import java.util.Iterator;
 import java.util.List;
 
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
+import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 

@@ -28,7 +28,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import io.github.bitterfox.json.string.template.base.JsonBridge;
+import io.github.bitterfox.json.string.template.core.JsonBridge;
 
 public class OrgJsonJsonBridge implements JsonBridge<Object> {
     @Override

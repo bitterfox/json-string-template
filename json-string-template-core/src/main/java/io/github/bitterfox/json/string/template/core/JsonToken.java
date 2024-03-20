@@ -19,20 +19,20 @@
  *
  */
 
-package io.github.bitterfox.json.string.template.base;
+package io.github.bitterfox.json.string.template.core;
 
-import io.github.bitterfox.json.string.template.base.JsonToken.JTArrayClose;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTArrayOpen;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTColon;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTComma;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTFalse;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTJavaObject;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTNull;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTNumber;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTObjectClose;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTObjectOpen;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTString;
-import io.github.bitterfox.json.string.template.base.JsonToken.JTTrue;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTComma;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTFalse;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTNull;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTNumber;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectClose;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
 public sealed interface JsonToken
         permits JTObjectOpen,

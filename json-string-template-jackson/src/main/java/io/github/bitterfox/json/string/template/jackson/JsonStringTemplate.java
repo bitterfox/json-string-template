@@ -23,7 +23,7 @@ package io.github.bitterfox.json.string.template.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 public class JsonStringTemplate {
     private static final ObjectMapper DEFAULT_MAPPER = new ObjectMapper();

@@ -22,7 +22,7 @@
 package io.github.bitterfox.json.string.template.jakarta.json;
 
 
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;

@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import io.github.bitterfox.json.string.template.base.JsonBridge;
+import io.github.bitterfox.json.string.template.core.JsonBridge;
 
 import jakarta.json.Json;
 import jakarta.json.JsonValue;

@@ -19,17 +19,23 @@
  *
  */
 
-package io.github.bitterfox.json.string.template.base;
+package io.github.bitterfox.json.string.template.core;
 
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
-import io.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
+import java.util.List;
+import java.util.Map;
 
-public sealed interface JsonCharacter
-        permits JCCh,
-                JCObj,
-                JCWhitespace {
-    record JCCh(char ch) implements JsonCharacter {}
-    record JCObj(Object obj) implements JsonCharacter {}
-    record JCWhitespace(char whitespace) implements JsonCharacter {}
+public interface JsonBridge<JSON> {
+    JSON createObject(Map<String, JSON> object);
+    JSON createArray(List<JSON> array);
+
+    JSON createString(String string);
+    JSON createNumber(String number);
+    JSON createNumber(Number number);
+
+    JSON createTrue();
+    JSON createFalse();
+    JSON createNull();
+
+    boolean isJsonObject(Object o);
+    JSON convertToJsonObject(Object o);
 }
