@@ -22,8 +22,9 @@ package com.github.bitterfox.json.string.template.base;
 import java.util.Iterator;
 import java.util.List;
 
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterCh;
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 
@@ -66,17 +67,24 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
         return n;
     }
 
+    public JsonCharacter peek() {
+        return next;
+    }
+
     private void readNext() {
         if (current == null) {
             readNextString();
         }
 
-        skipWhitespace();
         if (cursor < current.length()) {
-            next = new JsonCharacterCh(current.charAt(cursor++));
+            if (isWhitespace()) {
+                next = new JCWhitespace(current.charAt(cursor++));
+            } else {
+                next = new JCCh(current.charAt(cursor++));
+            }
         } else {
             if (values.hasNext()) {
-                next = new JsonCharacterObj(values.next());
+                next = new JCObj(values.next());
             }
             if (fragments.hasNext()) {
                 readNextString();
@@ -91,14 +99,10 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
         cursor = 0;
     }
 
-    private void skipWhitespace() {
-        while (cursor < current.length()) {
-            switch (current.charAt(cursor)) {
-                case ' ', '\t', '\n', '\r':
-                    cursor++;
-                    break;
-                default: return;
-            }
-        }
+    private boolean isWhitespace() {
+        return switch (current.charAt(cursor)) {
+            case ' ', '\t', '\n', '\r' -> true;
+            default -> false;
+        };
     }
 }

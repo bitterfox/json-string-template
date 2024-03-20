@@ -19,10 +19,15 @@
 
 package com.github.bitterfox.json.string.template.base;
 
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterCh;
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
 
-public sealed interface JsonCharacter permits JsonCharacterCh, JsonCharacterObj {
-    record JsonCharacterCh(char ch) implements JsonCharacter {}
-    record JsonCharacterObj(Object obj) implements JsonCharacter {}
+public sealed interface JsonCharacter
+        permits JCCh,
+                JCObj,
+                JCWhitespace {
+    record JCCh(char ch) implements JsonCharacter {}
+    record JCObj(Object obj) implements JsonCharacter {}
+    record JCWhitespace(char whitespace) implements JsonCharacter {}
 }

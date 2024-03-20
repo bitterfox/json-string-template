@@ -26,8 +26,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterCh;
-import com.github.bitterfox.json.string.template.base.JsonCharacter.JsonCharacterObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCCh;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCObj;
+import com.github.bitterfox.json.string.template.base.JsonCharacter.JCWhitespace;
 
 class JsonCharacterIteratorTest {
     public StringTemplate.Processor<List<JsonCharacter>, RuntimeException> JC =
@@ -58,21 +59,26 @@ class JsonCharacterIteratorTest {
 
         assertEquals(
                 List.of(
-                        ch('{'),
-                        ch('"'), obj(o1), ch('"'), ch(':'), ch('['), obj(o2), ch(','), obj(o3), ch(']'), ch(','),
-                        ch('"'), ch('t'), ch('e'), ch('s'), ch('t'), ch('"'), ch(':'),
-                        ch('1'), ch('2'), ch('3'), ch('4'), ch(','),
-                        ch('"'), ch('n'), ch('u'), ch('l'), ch('l'), ch('"'), ch(':'), obj(o4),
-                        ch('}')
+                        ch('{'), nl,
+                        w, w, w, w, ch('"'), obj(o1), ch('"'), ch(':'),
+                            w, ch('['), w, obj(o2), ch(','), w, obj(o3), w, ch(']'), ch(','), nl,
+                        w, w, w, w, ch('"'), ch('t'), ch('e'), ch('s'), ch('t'), ch('"'), ch(':'),
+                            w, ch('1'), ch('2'), ch('3'), ch('4'), ch(','), nl,
+                        w, w, w, w, ch('"'), ch('n'), ch('u'), ch('l'), ch('l'), ch('"'), ch(':'),
+                            w, obj(o4), nl,
+                        ch('}'), nl
                 ),
                 chs);
     }
 
-    private JsonCharacterCh ch(char ch) {
-        return new JsonCharacterCh(ch);
+    private JCWhitespace w = new JCWhitespace(' ');
+    private JCWhitespace nl = new JCWhitespace('\n');
+
+    private JCCh ch(char ch) {
+        return new JCCh(ch);
     }
 
-    private JsonCharacterObj obj(Object obj) {
-        return new JsonCharacterObj(obj);
+    private JCObj obj(Object obj) {
+        return new JCObj(obj);
     }
 }
