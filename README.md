@@ -5,20 +5,28 @@
 ![GitHub License](https://img.shields.io/github/license/bitterfox/json-string-template)
 
 Java 21 introduced the [String Template](https://openjdk.org/jeps/430) feature as a new preview feature.
-This feature allows users to create a String literal with embedded expressions.
-It also enables developers to define their own parser and conversion logic to any Java object.
+This feature allows users to create String literals with embedded expressions.
+It also enables developers to define their own processor with a conversion logic to any Java object.
 
 The JEP discusses [the possibility of String Template for JSON](https://openjdk.org/jeps/430#The-template-processor-API), as shown below:
 
-```java
-JSONObject doc = JSON."""
-    {
-        "name":    "\{name}",
-        "phone":   "\{phone}",
-        "address": "\{address}"
-    };
-    """;
-```
+> ```java
+> var JSON = StringTemplate.Processor.of(
+>         (StringTemplate st) -> new JSONObject(st.interpolate())
+>     );
+>
+> String name    = "Joan Smith";
+> String phone   = "555-123-4567";
+> String address = "1 Maple Drive, Anytown";
+> JSONObject doc = JSON."""
+>     {
+>         "name":    "\{name}",
+>         "phone":   "\{phone}",
+>         "address": "\{address}"
+>     };
+>     """;
+> ```
+> Users of this hypothetical JSON processor never see the String produced by st.interpolate(). However, using st.interpolate() in this way risks propagating injection vulnerabilities into the JSON result. We can be prudent and revise the code to check the template's values first and throw a checked exception, JSONException, if a value is suspicious:
 
 As the JEP mentions, there is an issue with the above expression when the embedded expression contains symbols that need to be escaped, such as `"`.
 
