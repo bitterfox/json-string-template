@@ -1,6 +1,4 @@
-import org.gradle.internal.impldep.org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization
-import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
-import net.thebugmc.gradle.sonatypepublisher.PublishingType.USER_MANAGED // at the top of the file
+import net.thebugmc.gradle.sonatypepublisher.PublishingType.USER_MANAGED
 
 plugins {
     id("java")
