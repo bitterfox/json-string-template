@@ -27,6 +27,9 @@ import java.util.List;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonPosition.EndOfStringTemplate;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 
@@ -36,6 +39,10 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
     private String current;
     private int cursor;
     private JsonCharacter next;
+
+    private JsonPosition pos;
+
+    private int index = 0;
 
     public JsonCharacterIterator(List<String> fragments, List<Object> values) {
         require(!fragments.isEmpty());
@@ -80,23 +87,30 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 
         if (cursor < current.length()) {
             if (isWhitespace()) {
-                next = new JCWhitespace(current.charAt(cursor++));
+                pos = new FragmnetPosition(index, cursor);
+                next = new JCWhitespace(current.charAt(cursor++), pos);
             } else {
-                next = new JCCh(current.charAt(cursor++));
+                pos = new FragmnetPosition(index, cursor);
+                next = new JCCh(current.charAt(cursor++), pos);
             }
         } else {
             if (values.hasNext()) {
-                next = new JCObj(values.next());
+                pos = new ValuePosition(index);
+                next = new JCObj(values.next(), pos);
             }
             if (fragments.hasNext()) {
                 readNextString();
             } else {
+                pos = new EndOfStringTemplate();
                 next = null;
             }
         }
     }
 
     private void readNextString() {
+        if (current != null) {
+            index++;
+        }
         current = fragments.next();
         cursor = 0;
     }

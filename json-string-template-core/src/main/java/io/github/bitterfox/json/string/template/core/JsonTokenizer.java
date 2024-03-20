@@ -77,7 +77,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         }
 
         next = switch (iterator.peek()) {
-            case JCCh(char ch) -> switch (ch) {
+            case JCCh(char ch, _) -> switch (ch) {
                 case '{' -> read(JsonToken.OBJECT_OPEN);
                 case '}' -> read(JsonToken.OBJECT_CLOSE);
                 case '[' -> read(JsonToken.ARRAY_OPEN);
@@ -96,7 +96,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                     }
                 }
             };
-            case JCObj(Object o) -> read(new JTJavaObject(o));
+            case JCObj(Object o, _) -> read(new JTJavaObject(o));
             case JCWhitespace _ -> throw new IllegalStateException("Unexpected branch");
         };
     }
@@ -108,7 +108,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         while (iterator.hasNext()) {
             JsonCharacter jch = iterator.next();
             switch (jch) {
-                case JCCh(char ch) -> {
+                case JCCh(char ch, _) -> {
                     if (ch == '\\') {
                         sb.append(readEscape());
                     } else if (ch == '"') {
@@ -117,8 +117,8 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                         sb.append(ch);
                     }
                 }
-                case JCObj(Object obj) -> sb.append(obj);
-                case JCWhitespace(char ch) -> sb.append(ch);
+                case JCObj(Object obj, _) -> sb.append(obj);
+                case JCWhitespace(char ch, _) -> sb.append(ch);
             }
         }
         throw new IllegalStateException(STR."String is not closed \{sb}");
@@ -126,7 +126,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
     private char readEscape() {
         return switch (iterator.next()) {
-            case JCCh(char ch) ->
+            case JCCh(char ch, _) ->
                 switch (ch) {
                     case '"', '\\', '/' -> ch;
                     case 'b' -> '\b'; // BS (backspace) 8
@@ -156,7 +156,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
     }
     private int readHex() {
         return switch (iterator.next()) {
-            case JCCh(char ch) -> readHex(ch);
+            case JCCh(char ch, _) -> readHex(ch);
             case JsonCharacter it -> throw new IllegalStateException(STR."Expected escaped char, but \{it} is not escaped char");
         };
     }
@@ -176,7 +176,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
     private JsonToken readLiteral() {
         return switch (iterator.peek()) {
-            case JCCh(char ch) -> switch (ch) {
+            case JCCh(char ch, _) -> switch (ch) {
                 case 't' -> accept("true", JsonToken.TRUE);
                 case 'f' -> accept("false", JsonToken.FALSE);
                 case 'n' -> accept("null", JsonToken.NULL);
@@ -195,7 +195,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
     private void accept(char expected) {
         JsonCharacter jch;
-        if ((jch = iterator.next()) instanceof JCCh(char actual) && expected == actual) {
+        if ((jch = iterator.next()) instanceof JCCh(char actual, _) && expected == actual) {
             return;
         }
 
@@ -208,7 +208,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
         // -
         switch (iterator.peek()) {
-            case JCCh(char ch) when ch == '-' -> {
+            case JCCh(char ch, _) when ch == '-' -> {
                 iterator.next();
                 number.append(ch);
             }
@@ -218,14 +218,14 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
         // 0
         // or digit1-9 {digit}
-        if (iterator.peek() instanceof JCCh(char ch)) {
+        if (iterator.peek() instanceof JCCh(char ch, _)) {
             if (ch == '0') {
                 iterator.next();
                 number.append(ch);
             } else if (Character.isDigit(ch)) { // digit 1-9
                 iterator.next();
                 number.append(ch);
-                while (iterator.peek() instanceof JCCh(char ch1) && Character.isDigit(ch1)) {
+                while (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
                     iterator.next();
                     number.append(ch1);
                 }
@@ -234,18 +234,18 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
         // fraction
         // [. digit {digit}]
-        if (iterator.peek() instanceof JCCh(char ch) && ch == '.') {
+        if (iterator.peek() instanceof JCCh(char ch, _) && ch == '.') {
             iterator.next();
             number.append(ch);
 
-            if (iterator.peek() instanceof JCCh(char ch1) && Character.isDigit(ch1)) {
+            if (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
                 iterator.next();
                 number.append(ch1);
             } else {
                 throw new IllegalStateException(STR."Expected digit after . for fraction, but \{iterator.peek()} found");
             }
 
-            while (iterator.peek() instanceof JCCh(char ch2) && Character.isDigit(ch2)) {
+            while (iterator.peek() instanceof JCCh(char ch2, _) && Character.isDigit(ch2)) {
                 iterator.next();
                 number.append(ch2);
             }
@@ -253,23 +253,23 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
         // exponent
         // [(E|e) [(-|+)] digit {digit}]
-        if (iterator.peek() instanceof JCCh(char ch) && (ch == 'E' || ch == 'e')) {
+        if (iterator.peek() instanceof JCCh(char ch, _) && (ch == 'E' || ch == 'e')) {
             iterator.next();
             number.append(ch);
 
-            if (iterator.peek() instanceof JCCh(char ch1) && (ch1 == '+' || ch1 == '-')) {
+            if (iterator.peek() instanceof JCCh(char ch1, _) && (ch1 == '+' || ch1 == '-')) {
                 iterator.next();
                 number.append(ch1);
             }
 
-            if (iterator.peek() instanceof JCCh(char ch1) && Character.isDigit(ch1)) {
+            if (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
                 iterator.next();
                 number.append(ch1);
             } else {
                 throw new IllegalStateException(STR."Expected digit after E/e for exponent, but \{iterator.peek()} found");
             }
 
-            while (iterator.peek() instanceof JCCh(char ch2) && Character.isDigit(ch2)) {
+            while (iterator.peek() instanceof JCCh(char ch2, _) && Character.isDigit(ch2)) {
                 iterator.next();
                 number.append(ch2);
             }

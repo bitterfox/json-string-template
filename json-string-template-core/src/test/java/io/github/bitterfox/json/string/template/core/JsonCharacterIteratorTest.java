@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 class JsonCharacterIteratorTest {
     public StringTemplate.Processor<List<JsonCharacter>, RuntimeException> JC =
@@ -59,28 +61,39 @@ class JsonCharacterIteratorTest {
                         }
                         """;
 
+        Factory f = new Factory();
         assertEquals(
                 List.of(
-                        ch('{'), nl,
-                        w, w, w, w, ch('"'), obj(o1), ch('"'), ch(':'),
-                            w, ch('['), w, obj(o2), ch(','), w, obj(o3), w, ch(']'), ch(','), nl,
-                        w, w, w, w, ch('"'), ch('t'), ch('e'), ch('s'), ch('t'), ch('"'), ch(':'),
-                            w, ch('1'), ch('2'), ch('3'), ch('4'), ch(','), nl,
-                        w, w, w, w, ch('"'), ch('n'), ch('u'), ch('l'), ch('l'), ch('"'), ch(':'),
-                            w, obj(o4), nl,
-                        ch('}'), nl
+                        f.ch('{'), f.nl(),
+                        f.w(), f.w(), f.w(), f.w(), f.ch('"'), f.obj(o1), f.ch('"'), f.ch(':'),
+                            f.w(), f.ch('['), f.w(), f.obj(o2), f.ch(','), f.w(), f.obj(o3), f.w(), f.ch(']'), f.ch(','), f.nl(),
+                        f.w(), f.w(), f.w(), f.w(), f.ch('"'), f.ch('t'), f.ch('e'), f.ch('s'), f.ch('t'), f.ch('"'), f.ch(':'),
+                            f.w(), f.ch('1'), f.ch('2'), f.ch('3'), f.ch('4'), f.ch(','), f.nl(),
+                        f.w(), f.w(), f.w(), f.w(), f.ch('"'), f.ch('n'), f.ch('u'), f.ch('l'), f.ch('l'), f.ch('"'), f.ch(':'),
+                            f.w(), f.obj(o4), f.nl(),
+                        f.ch('}'), f.nl()
                 ),
                 chs);
     }
 
-    private JCWhitespace w = new JCWhitespace(' ');
-    private JCWhitespace nl = new JCWhitespace('\n');
+    private static class Factory {
+        private int fragmentIndex;
+        private int cursor;
 
-    private JCCh ch(char ch) {
-        return new JCCh(ch);
-    }
+        private JCCh ch(char ch) {
+            return new JCCh(ch, new FragmnetPosition(fragmentIndex, cursor++));
+        }
 
-    private JCObj obj(Object obj) {
-        return new JCObj(obj);
+        private JCObj obj(Object obj) {
+            cursor = 0;
+            return new JCObj(obj, new ValuePosition(fragmentIndex++));
+        }
+
+        private JCWhitespace w() {
+            return new JCWhitespace(' ', new FragmnetPosition(fragmentIndex, cursor++));
+        }
+        private JCWhitespace nl() {
+            return new JCWhitespace('\n', new FragmnetPosition(fragmentIndex, cursor++));
+        }
     }
 }
