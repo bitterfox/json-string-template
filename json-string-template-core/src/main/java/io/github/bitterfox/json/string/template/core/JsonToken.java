@@ -71,7 +71,7 @@ public sealed interface JsonToken
     // :
     record JTColon() implements JsonToken {}
     // "..."
-    record JTString(String str) implements JsonToken {}
+    record JTString(String str, JsonPositionRange range) implements JsonToken {}
     // number
     record JTNumber(String number) implements JsonToken {}
     // true

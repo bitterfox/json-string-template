@@ -111,7 +111,7 @@ public class JsonParser<JSON> {
     private String parseString() {
         JsonToken token = tokenizer.next();
         return switch (token) {
-            case JTString(String str) -> str;
+            case JTString(String str, _) -> str;
             case JTJavaObject(Object o) -> o.toString(); // or NPE
             default -> throw new IllegalStateException(STR."Unexpected token \{token}");
         };
@@ -120,7 +120,7 @@ public class JsonParser<JSON> {
     private JSON parseLiteral() {
         JsonToken token = tokenizer.next();
         return switch (token) {
-            case JTString(String str) -> jsonBridge.createString(str);
+            case JTString(String str, _) -> jsonBridge.createString(str);
             case JTNumber(String number) -> jsonBridge.createNumber(number);
             case JTTrue _ -> jsonBridge.createTrue();
             case JTFalse _ -> jsonBridge.createFalse();

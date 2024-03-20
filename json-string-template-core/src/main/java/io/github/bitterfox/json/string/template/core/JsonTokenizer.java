@@ -104,7 +104,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
     private JTString readString() {
         StringBuilder sb = new StringBuilder();
 
-        accept('"');
+        var startPos = accept('"').pos();
         while (iterator.hasNext()) {
             JsonCharacter jch = iterator.next();
             switch (jch) {
@@ -112,7 +112,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                     if (ch == '\\') {
                         sb.append(readEscape());
                     } else if (ch == '"') {
-                        return new JTString(sb.toString());
+                        return new JTString(sb.toString(), new JsonPositionRange(startPos, jch.pos()));
                     } else {
                         sb.append(ch);
                     }
@@ -193,10 +193,10 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         return it;
     }
 
-    private void accept(char expected) {
+    private JsonCharacter accept(char expected) {
         JsonCharacter jch;
         if ((jch = iterator.next()) instanceof JCCh(char actual, _) && expected == actual) {
-            return;
+            return jch;
         }
 
         throw new IllegalStateException(
