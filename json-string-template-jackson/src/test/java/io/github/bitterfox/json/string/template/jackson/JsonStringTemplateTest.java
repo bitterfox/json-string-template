@@ -24,8 +24,11 @@ package io.github.bitterfox.json.string.template.jackson;
 import static io.github.bitterfox.json.string.template.jackson.JsonStringTemplate.JSON;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,5 +76,39 @@ class JsonStringTemplateTest {
 
         System.out.println(new ObjectMapper().writeValueAsString(json));
 
+    }
+
+    @Test
+    void testCommon() {
+        int i = 1;
+        long l = 2;
+        double d = 3.4;
+        JsonNode json = JSON."""
+            {
+                "true": true,
+                "false": false,
+                "null": null,
+                "true-expr": \{true},
+                "false-expr": \{false},
+                "null-expr": \{null},
+                "number": 100,
+                "number-int": \{i},
+                "number-long": \{l},
+                "number-double": \{d},
+            }
+            """;
+
+        System.out.println(json);
+
+        assertTrue(json.get("true").asBoolean());
+        assertFalse(json.get("false").asBoolean());
+        assertTrue(json.get("null").isNull());
+        assertTrue(json.get("true-expr").asBoolean());
+        assertFalse(json.get("false-expr").asBoolean());
+        assertTrue(json.get("null-expr").isNull());
+        assertEquals(100, json.get("number").asInt());
+        assertEquals(i, json.get("number-int").asInt());
+        assertEquals(l, json.get("number-long").asLong());
+        assertEquals(d, json.get("number-double").asDouble());
     }
 }

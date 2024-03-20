@@ -24,13 +24,14 @@ package io.github.bitterfox.json.string.template.jakarta.json;
 import static io.github.bitterfox.json.string.template.jakarta.json.JsonStringTemplate.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 import jakarta.json.Json;
 import jakarta.json.JsonValue;
-
-import org.junit.jupiter.api.Test;
 
 class JsonStringTemplateTest {
     @Test
@@ -81,6 +82,44 @@ class JsonStringTemplateTest {
                         .add("father", Json.createObjectBuilder()
                                 .add("name", "James Arthur Gosling"))
                         .build(),
+                json);
+    }
+
+    @Test
+    void testCommon() {
+        int i = 1;
+        long l = 2;
+        double d = 3.4;
+        JsonValue json = JSON."""
+            {
+                "true": true,
+                "false": false,
+                "null": null,
+                "true-expr": \{true},
+                "false-expr": \{false},
+                "null-expr": \{null},
+                "number": 100,
+                "number-int": \{i},
+                "number-long": \{l},
+                "number-double": \{d},
+            }
+            """;
+
+        System.out.println(json);
+
+        assertEquals(
+                Json.createObjectBuilder()
+                    .add("true", JsonValue.TRUE)
+                    .add("false", JsonValue.FALSE)
+                    .add("null", JsonValue.NULL)
+                    .add("true-expr", JsonValue.TRUE)
+                    .add("false-expr", JsonValue.FALSE)
+                    .add("null-expr", JsonValue.NULL)
+                    .add("number", Json.createValue(new BigDecimal("100")))
+                    .add("number-int", Json.createValue(i))
+                    .add("number-long", Json.createValue(l))
+                    .add("number-double", Json.createValue(d))
+                    .build(),
                 json);
     }
 }

@@ -58,7 +58,7 @@ public class JsonParser<JSON> {
     private JSON parseValue() {
         return switch (tokenizer.peek()) {
             case JTObjectOpen _ -> parseObject();
-            case JTArrayClose _ -> parseArray();
+            case JTArrayOpen _ -> parseArray();
             case JTString _, JTNumber _, JTTrue _, JTFalse _, JTNull _, JTJavaObject _ -> parseLiteral();
             case JsonToken it -> throw new IllegalStateException(STR."Unexpected token \{it}");
         };
@@ -137,7 +137,7 @@ public class JsonParser<JSON> {
 
         // Default binding
         if (o == null) {
-            jsonBridge.createNull();
+            return jsonBridge.createNull();
         }
 
         return switch (o) {

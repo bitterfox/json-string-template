@@ -113,4 +113,48 @@ class JsonStringTemplateProcessorTest {
                 ),
                 json);
     }
+
+    @Test
+    void testArray() {
+        String name = "name";
+        String text = """
+                hello
+                world
+                """;
+        int number = 1234;
+
+        Object json = JSON."""
+                {
+                    \{name}: \{text},
+                    "number\{name}": \{number},
+                    "boolean": true,
+                    "array": [1, 2, 3, 4]
+                }
+                """;
+
+        assertEquals(
+                Map.of("name", text,
+                       "numbername", number,
+                       "boolean", true,
+                       "array", List.of(new BigDecimal(1), new BigDecimal(2), new BigDecimal(3), new BigDecimal(4))
+                ),
+                json);
+    }
+
+    @Test
+    void testNumbers() {
+
+        Object json = JSON."""
+                {
+                    "number1": 0.1234,
+                    "number2": 1.2345E-10
+                }
+                """;
+
+        assertEquals(
+                Map.of("number1", new BigDecimal("0.1234"),
+                       "number2", new BigDecimal("1.2345E-10")
+                ),
+                json);
+    }
 }
