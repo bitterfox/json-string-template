@@ -2,18 +2,35 @@ plugins {
     id("java")
 }
 
-group = "com.github.bitterfox"
-version = "0.1-SNAPSHOT"
+allprojects {
+    apply(plugin = "java")
 
-repositories {
-    mavenCentral()
-}
+    repositories {
+        mavenCentral()
+    }
 
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
+    group = "com.github.bitterfox"
+    version = "0.21.0-SNAPSHOT"
 
-tasks.test {
-    useJUnitPlatform()
+    dependencies {
+        testImplementation(platform("org.junit:junit-bom:5.9.1"))
+        testImplementation("org.junit.jupiter:junit-jupiter")
+    }
+
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.toVersion("21")
+        targetCompatibility = JavaVersion.toVersion("21")
+    }
+
+    tasks.test {
+        useJUnitPlatform()
+        jvmArgs("--enable-preview")
+    }
+
+    tasks.compileJava {
+        options.compilerArgs.add("--enable-preview")
+    }
+    tasks.compileTestJava {
+        options.compilerArgs.add("--enable-preview")
+    }
 }
