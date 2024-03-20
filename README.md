@@ -1,5 +1,9 @@
 # json-string-template
 
+![Static Badge](https://img.shields.io/badge/Java-21-blue)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.bitterfox/json-string-template-core)
+![GitHub License](https://img.shields.io/github/license/bitterfox/json-string-template)
+
 Java 21 introduced the [String Template](https://openjdk.org/jeps/430) feature as a new preview feature.
 This feature allows users to create a String literal with embedded expressions.
 It also enables developers to define their own parser and conversion logic to any Java object.
