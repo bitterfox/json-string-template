@@ -33,6 +33,7 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTComma;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTFalse;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTNull;
+import io.github.bitterfox.json.string.template.core.JsonToken.JTNumber;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectClose;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
@@ -96,7 +97,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                     }
                 }
             };
-            case JCObj(Object o, _) -> read(new JTJavaObject(o));
+            case JCObj(Object o, var pos) -> read(new JTJavaObject(o, pos));
             case JCWhitespace _ -> throw new IllegalStateException("Unexpected branch");
         };
     }
@@ -205,11 +206,13 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
     private JsonToken readNumber() {
         StringBuilder number = new StringBuilder();
+        JsonPosition start = iterator.peek().pos();
+        JsonPosition end = start;
 
         // -
         switch (iterator.peek()) {
             case JCCh(char ch, _) when ch == '-' -> {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch);
             }
             case JCCh _ -> {}
@@ -220,13 +223,13 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         // or digit1-9 {digit}
         if (iterator.peek() instanceof JCCh(char ch, _)) {
             if (ch == '0') {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch);
             } else if (Character.isDigit(ch)) { // digit 1-9
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch);
                 while (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
-                    iterator.next();
+                    end = iterator.next().pos();
                     number.append(ch1);
                 }
             }
@@ -235,18 +238,18 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         // fraction
         // [. digit {digit}]
         if (iterator.peek() instanceof JCCh(char ch, _) && ch == '.') {
-            iterator.next();
+            end = iterator.next().pos();
             number.append(ch);
 
             if (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch1);
             } else {
                 throw new IllegalStateException(STR."Expected digit after . for fraction, but \{iterator.peek()} found");
             }
 
             while (iterator.peek() instanceof JCCh(char ch2, _) && Character.isDigit(ch2)) {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch2);
             }
         }
@@ -254,28 +257,28 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         // exponent
         // [(E|e) [(-|+)] digit {digit}]
         if (iterator.peek() instanceof JCCh(char ch, _) && (ch == 'E' || ch == 'e')) {
-            iterator.next();
+            end = iterator.next().pos();
             number.append(ch);
 
             if (iterator.peek() instanceof JCCh(char ch1, _) && (ch1 == '+' || ch1 == '-')) {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch1);
             }
 
             if (iterator.peek() instanceof JCCh(char ch1, _) && Character.isDigit(ch1)) {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch1);
             } else {
                 throw new IllegalStateException(STR."Expected digit after E/e for exponent, but \{iterator.peek()} found");
             }
 
             while (iterator.peek() instanceof JCCh(char ch2, _) && Character.isDigit(ch2)) {
-                iterator.next();
+                end = iterator.next().pos();
                 number.append(ch2);
             }
         }
 
-        return new JsonToken.JTNumber(number.toString());
+        return new JTNumber(number.toString(), new JsonPositionRange(start, end));
     }
 
     private JsonToken read(JsonToken token) {

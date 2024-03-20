@@ -80,6 +80,10 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
         return next;
     }
 
+    public JsonPosition pos() {
+        return pos;
+    }
+
     private void readNext() {
         if (current == null) {
             readNextString();

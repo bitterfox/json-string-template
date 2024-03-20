@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
@@ -78,25 +80,34 @@ class JsonTokenizerTest {
                         // L1
                         OBJECT_OPEN,
                         // L2
-                        new JTString("o1"), COLON,
-                        ARRAY_OPEN, new JTJavaObject(o2), COMMA, new JTJavaObject(o3), ARRAY_CLOSE, COMMA,
+                        new JTString("o1", range(0, 6, 1, 0)), COLON,
+                        ARRAY_OPEN, new JTJavaObject(o2, valueAt(1)), COMMA, new JTJavaObject(o3, valueAt(2)), ARRAY_CLOSE, COMMA,
                         // L3
-                        new JTString("test"), COLON, new JTNumber("1234"), COMMA,
+                        new JTString("test", range(3, 8, 3, 13)), COLON, new JTNumber("1234", range(3, 16, 3, 19)), COMMA,
                         // L4
-                        new JTString("complex number"), COLON, new JTNumber("-1234.84E+5"), COMMA,
+                        new JTString("complex number", range(3, 26, 3, 41)), COLON, new JTNumber("-1234.84E+5", range(3, 44, 3, 54)), COMMA,
                         // L5
-                        new JTString("null"), COLON, new JTJavaObject(o4), COMMA,
+                        new JTString("null", range(3, 61, 3, 66)), COLON, new JTJavaObject(o4, valueAt(3)), COMMA,
                         // L6
-                        new JTString("true"), COLON, TRUE, COMMA,
+                        new JTString("true", range(4, 6, 4, 11)), COLON, TRUE, COMMA,
                         // L7
-                        new JTString("false"), COLON, FALSE, COMMA,
+                        new JTString("false", range(4, 24, 4, 30)), COLON, FALSE, COMMA,
                         // L8
-                        new JTString("null"), COLON, NULL,
+                        new JTString("null", range(4, 44, 4, 49)), COLON, NULL,
                         // L9
                         OBJECT_CLOSE
                 ),
                 tokens);
     }
+
+    private JsonPositionRange range(int si, int sc, int ei, int ec) {
+        return new JsonPositionRange(new FragmnetPosition(si, sc), new FragmnetPosition(ei, ec));
+    }
+
+    private ValuePosition valueAt(int i) {
+        return new ValuePosition(i);
+    }
+
 
     // TODO more test cases including failure pattern
 }

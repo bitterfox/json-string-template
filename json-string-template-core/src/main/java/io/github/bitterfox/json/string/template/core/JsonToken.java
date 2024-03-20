@@ -73,7 +73,7 @@ public sealed interface JsonToken
     // "..."
     record JTString(String str, JsonPositionRange range) implements JsonToken {}
     // number
-    record JTNumber(String number) implements JsonToken {}
+    record JTNumber(String number, JsonPositionRange range) implements JsonToken {}
     // true
     record JTTrue() implements JsonToken {}
     // false
@@ -82,5 +82,9 @@ public sealed interface JsonToken
     record JTNull() implements JsonToken {}
 
     // String template value
-    record JTJavaObject(Object o) implements JsonToken {}
+    record JTJavaObject(Object value, JsonPosition pos) implements JsonToken {
+        public JTJavaObject discardValue() {
+            return new JTJavaObject(null, pos);
+        }
+    }
 }
