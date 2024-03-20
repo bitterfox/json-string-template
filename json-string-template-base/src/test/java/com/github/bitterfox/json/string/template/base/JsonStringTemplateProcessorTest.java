@@ -78,24 +78,6 @@ class JsonStringTemplateProcessorTest {
         }
 
         @Override
-        public void addToObject(Object object, Object key, Object value) {
-            if (object instanceof Map m) {
-                m.put(key, value);
-            } else {
-                throw new RuntimeException(STR."Wrong object type, \{object.getClass()}");
-            }
-        }
-
-        @Override
-        public void addToArray(Object array, Object value) {
-            if (array instanceof List l) {
-                l.add(value);
-            } else {
-                throw new RuntimeException(STR."Wrong object type, \{array.getClass()}");
-            }
-        }
-
-        @Override
         public boolean isJsonObject(Object o) {
             // Test default convert
             return false;
