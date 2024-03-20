@@ -93,7 +93,7 @@ class JsonTokenizerTest {
                         // L7
                         new JTString("false", range(4, 24, 4, 30)), COLON, FALSE, COMMA,
                         // L8
-                        new JTString("null", range(4, 44, 4, 49)), COLON, NULL,
+                        new JTString("null", range(4, 4, 4, 49)), COLON, NULL,
                         // L9
                         OBJECT_CLOSE
                 ),
