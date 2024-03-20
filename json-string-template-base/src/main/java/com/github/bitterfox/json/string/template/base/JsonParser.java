@@ -21,7 +21,12 @@
 
 package com.github.bitterfox.json.string.template.base;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.github.bitterfox.json.string.template.base.JsonToken.JTArrayClose;
 import com.github.bitterfox.json.string.template.base.JsonToken.JTArrayOpen;
@@ -37,10 +42,10 @@ import com.github.bitterfox.json.string.template.base.JsonToken.JTString;
 import com.github.bitterfox.json.string.template.base.JsonToken.JTTrue;
 
 public class JsonParser<JSON> {
-    private JsonTokenizer tokenizer;
-    private JsonBridge<JSON> jsonBridge;
+    private final JsonTokenizer tokenizer;
+    private final JsonBridge<JSON> jsonBridge;
 
-    public JsonParser(JsonTokenizer tokenizer, JsonBridge jsonBridge) {
+    public JsonParser(JsonTokenizer tokenizer, JsonBridge<JSON> jsonBridge) {
         this.tokenizer = tokenizer;
         this.jsonBridge = jsonBridge;
     }
@@ -61,12 +66,16 @@ public class JsonParser<JSON> {
     private JSON parseObject() {
         accept(new JTObjectOpen());
 
-        JSON json = jsonBridge.createObject();
+        Map<String, JSON> object = new HashMap<>();
         while (!(tokenizer.peek() instanceof JTObjectClose)) {
-            JSON key = parseString();
+            String key = parseString();
             accept(new JTColon());
             JSON value = parseValue();
-            jsonBridge.addToObject(json, key, value);
+            if (object.containsKey(key)) {
+                // TODO Make behavior can be defined in JsonBridge
+                throw new IllegalStateException(STR."Duplicated \{key}, \{object}");
+            }
+            object.put(key, value);
 
             if (tokenizer.peek() instanceof JTObjectClose) {
                 // do nothing
@@ -76,16 +85,16 @@ public class JsonParser<JSON> {
         }
 
         accept(new JTObjectClose());
-        return json;
+        return jsonBridge.createObject(object);
     }
 
     private JSON parseArray() {
         accept(new JTArrayOpen());
 
-        JSON json = jsonBridge.createArray();
+        List<JSON> array = new ArrayList<>();
         while (!(tokenizer.peek() instanceof JTArrayClose)) {
             JSON value = parseValue();
-            jsonBridge.addToArray(json, value);
+            array.add(value);
 
             if (tokenizer.peek() instanceof JTArrayClose) {
                 // do nothing
@@ -95,15 +104,14 @@ public class JsonParser<JSON> {
         }
 
         accept(new JTArrayClose());
-        return json;
+        return jsonBridge.createArray(array);
     }
 
-
-    private JSON parseString() {
+    private String parseString() {
         JsonToken token = tokenizer.next();
         return switch (token) {
-            case JTString(String str) -> jsonBridge.createString(str);
-            case JTJavaObject(Object o) -> jsonBridge.createString(o.toString()); // or NPE
+            case JTString(String str) -> str;
+            case JTJavaObject(Object o) -> o.toString(); // or NPE
             default -> throw new IllegalStateException(STR."Unexpected token \{token}");
         };
     }
@@ -135,10 +143,10 @@ public class JsonParser<JSON> {
             case Number n -> jsonBridge.createNumber(n);
             case Boolean b -> b ? jsonBridge.createTrue() : jsonBridge.createFalse();
             case Collection<?> c -> {
-                JSON array = jsonBridge.createArray();
-                c.stream()
-                 .map(this::convertJavaObject)
-                 .forEach(e -> jsonBridge.addToArray(array, e));
+                JSON array = jsonBridge.createArray(
+                        c.stream()
+                                .map(this::convertJavaObject)
+                                .collect(Collectors.toList()));
                 yield array;
             }
             case Object _ -> jsonBridge.createString(o.toString());

@@ -33,18 +33,18 @@ import org.junit.jupiter.api.Test;
 
 class JsonStringTemplateProcessorTest {
     private StringTemplate.Processor<Object, RuntimeException> JSON =
-            new JsonStringTemplateProcessor<>(new JavaObjectJsonBridge());
+            JsonStringTemplateProcessor.of(new JavaObjectJsonBridge());
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static class JavaObjectJsonBridge implements JsonBridge<Object> {
         @Override
-        public Object createObject() {
-            return new HashMap<>();
+        public Object createObject(Map<String, Object> object) {
+            return object;
         }
 
         @Override
-        public Object createArray() {
-            return new ArrayList<>();
+        public Object createArray(List<Object> array) {
+            return array;
         }
 
         @Override

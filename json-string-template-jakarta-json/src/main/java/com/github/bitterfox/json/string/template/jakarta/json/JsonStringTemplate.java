@@ -19,23 +19,18 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.base;
+package com.github.bitterfox.json.string.template.jakarta.json;
 
-import java.util.List;
-import java.util.Map;
 
-public interface JsonBridge<JSON> {
-    JSON createObject(Map<String, JSON> object);
-    JSON createArray(List<JSON> array);
+import com.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
 
-    JSON createString(String string);
-    JSON createNumber(String number);
-    JSON createNumber(Number number);
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 
-    JSON createTrue();
-    JSON createFalse();
-    JSON createNull();
-
-    boolean isJsonObject(Object o);
-    JSON convertToJsonObject(Object o);
+public class JsonStringTemplate {
+    public static final JsonStringTemplateProcessor<JsonValue> JSON =
+            JsonStringTemplateProcessor.of(new JakartaJsonJsonBridge());
+    public static final JsonStringTemplateProcessor<JsonObject> JSON_O = JSON.andThen(JsonValue::asJsonObject);
+    public static final JsonStringTemplateProcessor<JsonArray> JSON_A = JSON.andThen(JsonValue::asJsonArray);
 }

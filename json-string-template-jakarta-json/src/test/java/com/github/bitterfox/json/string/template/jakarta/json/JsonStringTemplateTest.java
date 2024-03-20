@@ -19,23 +19,29 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.base;
+package com.github.bitterfox.json.string.template.jakarta.json;
 
-import java.util.List;
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public interface JsonBridge<JSON> {
-    JSON createObject(Map<String, JSON> object);
-    JSON createArray(List<JSON> array);
+import jakarta.json.Json;
+import jakarta.json.JsonValue;
 
-    JSON createString(String string);
-    JSON createNumber(String number);
-    JSON createNumber(Number number);
+import org.junit.jupiter.api.Test;
 
-    JSON createTrue();
-    JSON createFalse();
-    JSON createNull();
+class JsonStringTemplateTest {
+    @Test
+    void test() {
+        String value = "te\nst";
+        JsonValue json = JsonStringTemplate.JSON."""
+                {
+                    "test": \{value}
+                }
+                """;
 
-    boolean isJsonObject(Object o);
-    JSON convertToJsonObject(Object o);
+        assertEquals(
+                Json.createObjectBuilder()
+                        .add("test", value)
+                        .build(),
+                json);
+    }
 }
