@@ -1,0 +1,8 @@
+<component name="CopyrightManager">
+  <settings default="Apache">
+    <module2copyright>
+      <element module="Tests" copyright="Apache" />
+      <element module="Project Files" copyright="Apache" />
+    </module2copyright>
+  </settings>
+</component>
