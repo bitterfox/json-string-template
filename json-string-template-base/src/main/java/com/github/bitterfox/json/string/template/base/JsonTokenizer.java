@@ -59,10 +59,13 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
     @Override
     public JsonToken next() {
-        System.out.println(next);
         var n = next;
         readNext();
         return n;
+    }
+
+    public JsonToken peek() {
+        return next;
     }
 
     private void readNext() {
