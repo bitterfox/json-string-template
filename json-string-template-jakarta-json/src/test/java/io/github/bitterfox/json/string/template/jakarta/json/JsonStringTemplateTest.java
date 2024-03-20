@@ -19,16 +19,29 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.org.json;
+package io.github.bitterfox.json.string.template.jakarta.json;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+import jakarta.json.Json;
+import jakarta.json.JsonValue;
 
-public class JsonStringTemplate {
-    private static final JsonStringTemplateProcessor<Object> JSON =
-            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
-    public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
-    public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+import org.junit.jupiter.api.Test;
+
+class JsonStringTemplateTest {
+    @Test
+    void test() {
+        String value = "te\nst";
+        JsonValue json = JsonStringTemplate.JSON."""
+                {
+                    "test": \{value}
+                }
+                """;
+
+        assertEquals(
+                Json.createObjectBuilder()
+                        .add("test", value)
+                        .build(),
+                json);
+    }
 }

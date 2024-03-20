@@ -19,16 +19,23 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.org.json;
+package io.github.bitterfox.json.string.template.base;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.List;
+import java.util.Map;
 
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+public interface JsonBridge<JSON> {
+    JSON createObject(Map<String, JSON> object);
+    JSON createArray(List<JSON> array);
 
-public class JsonStringTemplate {
-    private static final JsonStringTemplateProcessor<Object> JSON =
-            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
-    public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
-    public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+    JSON createString(String string);
+    JSON createNumber(String number);
+    JSON createNumber(Number number);
+
+    JSON createTrue();
+    JSON createFalse();
+    JSON createNull();
+
+    boolean isJsonObject(Object o);
+    JSON convertToJsonObject(Object o);
 }

@@ -19,16 +19,18 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.org.json;
+package io.github.bitterfox.json.string.template.jakarta.json;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
 
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+
 public class JsonStringTemplate {
-    private static final JsonStringTemplateProcessor<Object> JSON =
-            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
-    public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
-    public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+    public static final JsonStringTemplateProcessor<JsonValue> JSON =
+            JsonStringTemplateProcessor.of(new JakartaJsonJsonBridge());
+    public static final JsonStringTemplateProcessor<JsonObject> JSON_O = JSON.andThen(JsonValue::asJsonObject);
+    public static final JsonStringTemplateProcessor<JsonArray> JSON_A = JSON.andThen(JsonValue::asJsonArray);
 }

@@ -9,7 +9,7 @@ allprojects {
         mavenCentral()
     }
 
-    group = "com.github.bitterfox"
+    group = "io.github.bitterfox"
     version = "0.21.0-SNAPSHOT"
 
     dependencies {

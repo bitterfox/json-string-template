@@ -21,12 +21,11 @@
 
 package com.github.bitterfox.json.string.template.org.json;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.junit.jupiter.api.Test;
 
 class JsonStringTemplateTest {

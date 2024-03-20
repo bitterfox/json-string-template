@@ -19,16 +19,31 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.org.json;
+package io.github.bitterfox.json.string.template.jackson;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
+import org.junit.jupiter.api.Test;
 
-public class JsonStringTemplate {
-    private static final JsonStringTemplateProcessor<Object> JSON =
-            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
-    public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
-    public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+import com.fasterxml.jackson.databind.JsonNode;
+
+class JsonStringTemplateTest {
+    private record MyData(String test1, int test2) {}
+
+    @Test
+    void name() {
+        String test = "te\nst";
+        MyData testData = new MyData("hello", 0xcafebabe);
+
+        JsonNode json = JsonStringTemplate.JSON."""
+                {
+                    "test": \{test},
+                    "request": \{testData}
+                }
+                """;
+
+        assertEquals(test, json.get("test").asText());
+        assertEquals("hello", json.get("request").get("test1").asText());
+        assertEquals(0xcafebabe, json.get("request").get("test2").asInt());
+    }
 }

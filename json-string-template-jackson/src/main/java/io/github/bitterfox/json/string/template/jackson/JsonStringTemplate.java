@@ -19,16 +19,15 @@
  *
  */
 
-package com.github.bitterfox.json.string.template.org.json;
+package io.github.bitterfox.json.string.template.jackson;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.bitterfox.json.string.template.base.JsonStringTemplateProcessor;
 
 public class JsonStringTemplate {
-    private static final JsonStringTemplateProcessor<Object> JSON =
-            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
-    public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
-    public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+    private static final ObjectMapper DEFAULT_MAPPER = new ObjectMapper();
+
+    public static final JsonStringTemplateProcessor<JsonNode> JSON =
+            JsonStringTemplateProcessor.of(new JacksonJsonBridge(DEFAULT_MAPPER));
 }
