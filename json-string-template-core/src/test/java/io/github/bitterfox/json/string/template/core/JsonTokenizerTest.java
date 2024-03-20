@@ -21,6 +21,7 @@
 
 package io.github.bitterfox.json.string.template.core;
 
+import static io.github.bitterfox.json.string.template.core.JsonToken.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -75,27 +76,26 @@ class JsonTokenizerTest {
         assertEquals(
                 List.of(
                         // L1
-                        new JTObjectOpen(),
+                        OBJECT_OPEN,
                         // L2
-                        new JTString("o1"), new JTColon(),
-                        new JTArrayOpen(), new JTJavaObject(o2), new JTComma(), new JTJavaObject(o3), new JTArrayClose(), new JTComma(),
+                        new JTString("o1"), COLON,
+                        ARRAY_OPEN, new JTJavaObject(o2), COMMA, new JTJavaObject(o3), ARRAY_CLOSE, COMMA,
                         // L3
-                        new JTString("test"), new JTColon(), new JTNumber("1234"), new JTComma(),
+                        new JTString("test"), COLON, new JTNumber("1234"), COMMA,
                         // L4
-                        new JTString("complex number"), new JTColon(), new JTNumber("-1234.84E+5"), new JTComma(),
+                        new JTString("complex number"), COLON, new JTNumber("-1234.84E+5"), COMMA,
                         // L5
-                        new JTString("null"), new JTColon(), new JTJavaObject(o4), new JTComma(),
+                        new JTString("null"), COLON, new JTJavaObject(o4), COMMA,
                         // L6
-                        new JTString("true"), new JTColon(), new JTTrue(), new JTComma(),
+                        new JTString("true"), COLON, TRUE, COMMA,
                         // L7
-                        new JTString("false"), new JTColon(), new JTFalse(), new JTComma(),
+                        new JTString("false"), COLON, FALSE, COMMA,
                         // L8
-                        new JTString("null"), new JTColon(), new JTNull(),
+                        new JTString("null"), COLON, NULL,
                         // L9
-                        new JTObjectClose()
+                        OBJECT_CLOSE
                 ),
-                tokens
-        );
+                tokens);
     }
 
     // TODO more test cases including failure pattern

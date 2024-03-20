@@ -65,12 +65,12 @@ public class JsonParser<JSON> {
     }
 
     private JSON parseObject() {
-        accept(new JTObjectOpen());
+        accept(JsonToken.OBJECT_OPEN);
 
         Map<String, JSON> object = new HashMap<>();
         while (!(tokenizer.peek() instanceof JTObjectClose)) {
             String key = parseString();
-            accept(new JTColon());
+            accept(JsonToken.COLON);
             JSON value = parseValue();
             if (object.containsKey(key)) {
                 // TODO Make behavior can be defined in JsonBridge
@@ -81,16 +81,16 @@ public class JsonParser<JSON> {
             if (tokenizer.peek() instanceof JTObjectClose) {
                 // do nothing
             } else {
-                accept(new JTComma());
+                accept(JsonToken.COMMA);
             }
         }
 
-        accept(new JTObjectClose());
+        accept(JsonToken.OBJECT_CLOSE);
         return jsonBridge.createObject(object);
     }
 
     private JSON parseArray() {
-        accept(new JTArrayOpen());
+        accept(JsonToken.ARRAY_OPEN);
 
         List<JSON> array = new ArrayList<>();
         while (!(tokenizer.peek() instanceof JTArrayClose)) {
@@ -100,11 +100,11 @@ public class JsonParser<JSON> {
             if (tokenizer.peek() instanceof JTArrayClose) {
                 // do nothing
             } else {
-                accept(new JTComma());
+                accept(JsonToken.COMMA);
             }
         }
 
-        accept(new JTArrayClose());
+        accept(JsonToken.ARRAY_CLOSE);
         return jsonBridge.createArray(array);
     }
 

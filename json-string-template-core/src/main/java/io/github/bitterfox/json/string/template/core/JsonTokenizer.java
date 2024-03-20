@@ -78,12 +78,12 @@ public class JsonTokenizer implements Iterator<JsonToken> {
 
         next = switch (iterator.peek()) {
             case JCCh(char ch) -> switch (ch) {
-                case '{' -> read(new JTObjectOpen());
-                case '}' -> read(new JTObjectClose());
-                case '[' -> read(new JTArrayOpen());
-                case ']' -> read(new JTArrayClose());
-                case ',' -> read(new JTComma());
-                case ':' -> read(new JTColon());
+                case '{' -> read(JsonToken.OBJECT_OPEN);
+                case '}' -> read(JsonToken.OBJECT_CLOSE);
+                case '[' -> read(JsonToken.ARRAY_OPEN);
+                case ']' -> read(JsonToken.ARRAY_CLOSE);
+                case ',' -> read(JsonToken.COMMA);
+                case ':' -> read(JsonToken.COLON);
                 case '"' -> readString();
                 // can be true, false or null
                 case 't', 'f', 'n' -> readLiteral();
@@ -139,7 +139,6 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                 };
             case JsonCharacter it -> throw new IllegalStateException(STR."Expected escaped char, but \{it} is not escaped char");
         };
-
     }
 
     private char readEscapedHex() {
@@ -178,9 +177,9 @@ public class JsonTokenizer implements Iterator<JsonToken> {
     private JsonToken readLiteral() {
         return switch (iterator.peek()) {
             case JCCh(char ch) -> switch (ch) {
-                case 't' -> accept("true", new JTTrue());
-                case 'f' -> accept("false", new JTFalse());
-                case 'n' -> accept("null", new JTNull());
+                case 't' -> accept("true", JsonToken.TRUE);
+                case 'f' -> accept("false", JsonToken.FALSE);
+                case 'n' -> accept("null", JsonToken.NULL);
                 default -> throw new IllegalStateException(STR."Unexpected token json char \{ch}");
             };
             default -> throw new IllegalStateException("Unexpected branch");

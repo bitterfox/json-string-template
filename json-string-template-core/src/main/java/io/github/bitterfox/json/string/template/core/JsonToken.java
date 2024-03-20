@@ -48,6 +48,16 @@ public sealed interface JsonToken
                 JTNull,
                 JTJavaObject {
 
+    JTObjectOpen OBJECT_OPEN = new JTObjectOpen();
+    JTObjectClose OBJECT_CLOSE = new JTObjectClose();
+    JTArrayOpen ARRAY_OPEN = new JTArrayOpen();
+    JTArrayClose ARRAY_CLOSE = new JTArrayClose();
+    JTComma COMMA = new JTComma();
+    JTColon COLON = new JTColon();
+    JTTrue TRUE = new JTTrue();
+    JTFalse FALSE = new JTFalse();
+    JTNull NULL = new JTNull();
+
     // {
     record JTObjectOpen() implements JsonToken {}
     // }
