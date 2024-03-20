@@ -25,11 +25,11 @@ Additionally, the core library, including the parser, does not depend on other J
 Currently, the following JSON libraries are integrated with this JSON String Template extension:
 
 - [Jakarta JSON Processing™ API](https://projects.eclipse.org/projects/ee4j.jsonp)
-  - json-string-template-jakarta-json
+  - [json-string-template-jakarta-json](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jakarta-json)
 - [JSON in Java a.k.a. org.json](https://github.com/stleary/JSON-java)
-  - json-string-template-org-json
+  - [json-string-template-org-json](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-org-json)
 - [Jackson](https://github.com/FasterXML/jackson)
-  - json-string-template-jackson
+  - [json-string-template-jackson](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jackson)
 
 ## Disclaimer
 Until String Template is released and this library becomes version 1.x.x, any part of feature in this library
