@@ -1,8 +1,10 @@
 import org.gradle.internal.impldep.org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization
 import org.gradle.internal.impldep.org.bouncycastle.cms.RecipientId.password
+import net.thebugmc.gradle.sonatypepublisher.PublishingType.USER_MANAGED // at the top of the file
 
 plugins {
     id("java")
+    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
 }
 
 allprojects {
@@ -13,7 +15,8 @@ allprojects {
     }
 
     group = "io.github.bitterfox"
-    version = "0.21.0-SNAPSHOT"
+    // 0.<java version>.<minor version>
+    version = "0.21.0"
 
     dependencies {
         testImplementation(platform("org.junit:junit-bom:5.9.1"))
@@ -35,5 +38,49 @@ allprojects {
     }
     tasks.compileTestJava {
         options.compilerArgs.add("--enable-preview")
+    }
+}
+
+subprojects {
+    apply(plugin = "net.thebugmc.gradle.sonatype-central-portal-publisher")
+
+    signing {
+        useGpgCmd()
+    }
+
+    centralPortal {
+        publishingType = USER_MANAGED
+
+        name = project.name
+        description = "JSON String Template Libraries for Java's String Template Language Feature (Java 21, Preview)"
+
+        pom {
+            url = "https://github.com/bitterfox/json-string-template"
+            licenses {
+                license {
+                    name = "Apache License, Version 2.0"
+                    url = "https://www.apache.org/licenses/LICENSE-2.0"
+                }
+            }
+            developers {
+                developer {
+                    name = "bitter_fox"
+                }
+            }
+            scm {
+                url = "https://github.com/bitterfox/json-string-template"
+                connection = "scm:git:git://github.com/bitterfox/json-string-template.git"
+                developerConnection = "scm:git:git@github.com:bitterfox/json-string-template.git"
+            }
+        }
+
+        jarTask = tasks.jar
+
+        sourcesJarTask = tasks.create<Jar>("sourcesEmptyJar") {
+            archiveClassifier = "sources"
+        }
+        javadocJarTask = tasks.create<Jar>("javadocEmptyJar") {
+            archiveClassifier = "javadoc"
+        }
     }
 }
