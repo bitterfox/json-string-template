@@ -21,6 +21,7 @@
 
 package com.github.bitterfox.json.string.template.org.json;
 
+import static com.github.bitterfox.json.string.template.org.json.JsonStringTemplate.JSON_O;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ class JsonStringTemplateTest {
     @Test
     void test() {
         String value = "te\nst";
-        JSONObject json = JsonStringTemplate.JSON_O."""
+        JSONObject json = JSON_O."""
             {
                 "test": \{value}
             }

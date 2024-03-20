@@ -21,21 +21,24 @@
 
 package io.github.bitterfox.json.string.template.jackson;
 
+import static io.github.bitterfox.json.string.template.jackson.JsonStringTemplate.JSON;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class JsonStringTemplateTest {
     private record MyData(String test1, int test2) {}
 
     @Test
-    void name() {
+    void test() {
         String test = "te\nst";
         MyData testData = new MyData("hello", 0xcafebabe);
 
-        JsonNode json = JsonStringTemplate.JSON."""
+        JsonNode json = JSON."""
                 {
                     "test": \{test},
                     "request": \{testData}
@@ -45,5 +48,30 @@ class JsonStringTemplateTest {
         assertEquals(test, json.get("test").asText());
         assertEquals("hello", json.get("request").get("test1").asText());
         assertEquals(0xcafebabe, json.get("request").get("test2").asInt());
+    }
+
+    @Test
+    void test2() throws JsonProcessingException {
+        record Profile(
+                int id,
+                String name,
+                String status) {}
+
+        Profile profile = new Profile(101, "Duke", "Hello world!");
+        String token = "xxxx";
+
+        JsonNode json = JSON."""
+                {
+                    "token": \{token},
+                    "body": \{profile}
+                }
+                """;
+        assertEquals(token, json.get("token").asText());
+        assertEquals(101, json.get("body").get("id").asInt());
+        assertEquals("Duke", json.get("body").get("name").asText());
+        assertEquals("Hello world!", json.get("body").get("status").asText());
+
+        System.out.println(new ObjectMapper().writeValueAsString(json));
+
     }
 }

@@ -22,6 +22,7 @@
 package io.github.bitterfox.json.string.template.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -142,6 +143,13 @@ public class JsonParser<JSON> {
         return switch (o) {
             case Number n -> jsonBridge.createNumber(n);
             case Boolean b -> b ? jsonBridge.createTrue() : jsonBridge.createFalse();
+            case Object[] a -> {
+                JSON array = jsonBridge.createArray(
+                        Arrays.stream(a)
+                              .map(this::convertJavaObject)
+                              .collect(Collectors.toList()));
+                yield array;
+            }
             case Collection<?> c -> {
                 JSON array = jsonBridge.createArray(
                         c.stream()
