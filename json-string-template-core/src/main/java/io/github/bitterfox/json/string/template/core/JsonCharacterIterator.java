@@ -32,7 +32,6 @@ import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPositi
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
-
     private final Iterator<String> fragments;
     private final Iterator<Object> values;
 

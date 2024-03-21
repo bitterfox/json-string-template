@@ -21,16 +21,11 @@
 
 package io.github.bitterfox.json.string.template.core;
 
+import java.lang.StringTemplate.Processor;
 import java.util.function.Function;
 
-public class JsonStringTemplateProcessor<JSON> implements StringTemplate.Processor<JSON, RuntimeException> {
-    private final StringTemplate.Processor<JSON, RuntimeException> delegate;
-
-    private JsonStringTemplateProcessor(StringTemplate.Processor<JSON, RuntimeException> delegate) {
-        this.delegate = delegate;
-    }
-
-    public static <JSON> JsonStringTemplateProcessor<JSON> of(JsonBridge<JSON> jsonBridge) {
+public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, RuntimeException> {
+    static <JSON> JsonStringTemplateProcessor<JSON> of(JsonBridge<JSON> jsonBridge) {
         return ofV2(jsonBridge);
     }
 
@@ -41,12 +36,8 @@ public class JsonStringTemplateProcessor<JSON> implements StringTemplate.Process
      * @param <JSON>
      */
     @Deprecated(forRemoval = true)
-    public static <JSON> JsonStringTemplateProcessor<JSON> ofV1(JsonBridge<JSON> jsonBridge) {
-        return new JsonStringTemplateProcessor<>(
-                StringTemplate.Processor.of(stringTemplate -> {
-                    var parser = new JsonParserV1<>(new JsonTokenizer(stringTemplate), jsonBridge);
-                    return parser.parseJson();
-                }));
+    static <JSON> JsonStringTemplateProcessor<JSON> ofV1(JsonBridge<JSON> jsonBridge) {
+        return new JsonStringTemplateProcessorV1Impl<>(jsonBridge);
     }
 
     /**
@@ -56,21 +47,13 @@ public class JsonStringTemplateProcessor<JSON> implements StringTemplate.Process
      * @param <JSON>
      */
     @Deprecated(forRemoval = true)
-    public static <JSON> JsonStringTemplateProcessor<JSON> ofV2(JsonBridge<JSON> jsonBridge) {
-        return new JsonStringTemplateProcessor<>(
-                StringTemplate.Processor.of(stringTemplate -> {
-                    var parser = new JsonParserV2(new JsonTokenizer(stringTemplate));
-                    var compiler = new JsonCompiler<>(jsonBridge);
-                    return compiler.compile(parser.parseJson()).apply(stringTemplate.values());
-                }));
+    static <JSON> JsonStringTemplateProcessor<JSON> ofV2(JsonBridge<JSON> jsonBridge) {
+        return new JsonStringTemplateProcessorV2Impl<>(jsonBridge);
     }
 
-    @Override
-    public JSON process(StringTemplate stringTemplate) throws RuntimeException {
-        return delegate.process(stringTemplate);
-    }
+    JSON process(StringTemplate stringTemplate);
 
-    public <U> JsonStringTemplateProcessor<U> andThen(Function<? super JSON, ? extends U> f) {
-        return new JsonStringTemplateProcessor<U>(StringTemplate.Processor.of(t -> f.apply(this.process(t))));
+    default <U> JsonStringTemplateProcessor<U> andThen(Function<? super JSON, ? extends U> f) {
+        return new JsonStringTemplateProcessorAndThenImpl<>(this, f);
     }
 }
