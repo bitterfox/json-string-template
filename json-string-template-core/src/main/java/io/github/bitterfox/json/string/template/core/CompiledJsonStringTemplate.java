@@ -21,15 +21,9 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-import io.github.bitterfox.json.string.template.core.JsonPosition.EndOfStringTemplate;
-import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
-import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
+import java.util.List;
+import java.util.function.Function;
 
-public sealed interface JsonPosition
-        permits FragmentPosition,
-                ValuePosition,
-                EndOfStringTemplate {
-    record FragmentPosition(int index, int cursor) implements JsonPosition {}
-    record ValuePosition(int index) implements JsonPosition {}
-    record EndOfStringTemplate() implements JsonPosition {}
+public interface CompiledJsonStringTemplate<JSON> extends Function<List<Object>, JSON> {
+
 }

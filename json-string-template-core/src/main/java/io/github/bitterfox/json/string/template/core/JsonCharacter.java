@@ -24,14 +24,16 @@ package io.github.bitterfox.json.string.template.core;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public sealed interface JsonCharacter
         permits JCCh,
                 JCObj,
                 JCWhitespace {
-    record JCCh(char ch, JsonPosition pos) implements JsonCharacter {}
-    record JCObj(Object obj, JsonPosition pos) implements JsonCharacter {}
-    record JCWhitespace(char whitespace, JsonPosition pos) implements JsonCharacter {}
+    record JCCh(char ch, FragmentPosition pos) implements JsonCharacter {}
+    record JCObj(Object obj, ValuePosition pos) implements JsonCharacter {}
+    record JCWhitespace(char whitespace, FragmentPosition pos) implements JsonCharacter {}
 
     JsonPosition pos();
 }

@@ -31,8 +31,6 @@ import java.util.stream.Collectors;
 
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTComma;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTFalse;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTNull;
@@ -42,11 +40,11 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
-public class JsonParser<JSON> {
+public class JsonParserV1<JSON> {
     private final JsonTokenizer tokenizer;
     private final JsonBridge<JSON> jsonBridge;
 
-    public JsonParser(JsonTokenizer tokenizer, JsonBridge<JSON> jsonBridge) {
+    public JsonParserV1(JsonTokenizer tokenizer, JsonBridge<JSON> jsonBridge) {
         this.tokenizer = tokenizer;
         this.jsonBridge = jsonBridge;
     }
@@ -111,7 +109,7 @@ public class JsonParser<JSON> {
     private String parseString() {
         JsonToken token = tokenizer.next();
         return switch (token) {
-            case JTString(String str, _) -> str;
+            case JTString(var fragments, var values, _) -> STR.process(StringTemplate.of(fragments, values));
             case JTJavaObject(Object o, _) -> o.toString(); // or NPE
             default -> throw new IllegalStateException(STR."Unexpected token \{token}");
         };
@@ -120,7 +118,7 @@ public class JsonParser<JSON> {
     private JSON parseLiteral() {
         JsonToken token = tokenizer.next();
         return switch (token) {
-            case JTString(String str, _) -> jsonBridge.createString(str);
+            case JTString(var fragments, var values, _) -> jsonBridge.createString(STR.process(StringTemplate.of(fragments, values)));
             case JTNumber(String number, _) -> jsonBridge.createNumber(number);
             case JTTrue _ -> jsonBridge.createTrue();
             case JTFalse _ -> jsonBridge.createFalse();

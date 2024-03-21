@@ -21,7 +21,9 @@
 
 package io.github.bitterfox.json.string.template.core;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
@@ -103,6 +105,8 @@ public class JsonTokenizer implements Iterator<JsonToken> {
     }
 
     private JTString readString() {
+        List<String> fragments = new ArrayList<>();
+        List<Object> values = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         var startPos = accept('"').pos();
@@ -111,14 +115,21 @@ public class JsonTokenizer implements Iterator<JsonToken> {
             switch (jch) {
                 case JCCh(char ch, _) -> {
                     if (ch == '\\') {
+                        // TODO Use substring
                         sb.append(readEscape());
                     } else if (ch == '"') {
-                        return new JTString(sb.toString(), new JsonPositionRange(startPos, jch.pos()));
+                        fragments.add(sb.toString());
+                        return new JTString(fragments, values, new JsonPositionRange(startPos, jch.pos()));
                     } else {
                         sb.append(ch);
                     }
                 }
-                case JCObj(Object obj, _) -> sb.append(obj);
+                case JCObj(Object obj, _) -> {
+                    // TODO Use substring
+                    fragments.add(sb.toString());
+                    sb = new StringBuilder();
+                    values.add(obj);
+                }
                 case JCWhitespace(char ch, _) -> sb.append(ch);
             }
         }

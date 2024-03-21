@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
-import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 class JsonCharacterIteratorTest {
@@ -81,7 +81,7 @@ class JsonCharacterIteratorTest {
         private int cursor;
 
         private JCCh ch(char ch) {
-            return new JCCh(ch, new FragmnetPosition(fragmentIndex, cursor++));
+            return new JCCh(ch, new FragmentPosition(fragmentIndex, cursor++));
         }
 
         private JCObj obj(Object obj) {
@@ -90,10 +90,10 @@ class JsonCharacterIteratorTest {
         }
 
         private JCWhitespace w() {
-            return new JCWhitespace(' ', new FragmnetPosition(fragmentIndex, cursor++));
+            return new JCWhitespace(' ', new FragmentPosition(fragmentIndex, cursor++));
         }
         private JCWhitespace nl() {
-            return new JCWhitespace('\n', new FragmnetPosition(fragmentIndex, cursor++));
+            return new JCWhitespace('\n', new FragmentPosition(fragmentIndex, cursor++));
         }
     }
 }

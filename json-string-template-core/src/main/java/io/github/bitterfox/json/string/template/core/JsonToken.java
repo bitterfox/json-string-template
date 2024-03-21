@@ -21,6 +21,9 @@
 
 package io.github.bitterfox.json.string.template.core;
 
+import java.util.List;
+
+import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
@@ -71,7 +74,7 @@ public sealed interface JsonToken
     // :
     record JTColon() implements JsonToken {}
     // "..."
-    record JTString(String str, JsonPositionRange range) implements JsonToken {}
+    record JTString(List<String> fragments, List<Object> values, JsonPositionRange range) implements JsonToken {}
     // number
     record JTNumber(String number, JsonPositionRange range) implements JsonToken {}
     // true
@@ -82,9 +85,5 @@ public sealed interface JsonToken
     record JTNull() implements JsonToken {}
 
     // String template value
-    record JTJavaObject(Object value, JsonPosition pos) implements JsonToken {
-        public JTJavaObject discardValue() {
-            return new JTJavaObject(null, pos);
-        }
-    }
+    record JTJavaObject(Object value, ValuePosition pos) implements JsonToken {}
 }

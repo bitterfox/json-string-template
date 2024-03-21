@@ -28,7 +28,7 @@ import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
 import io.github.bitterfox.json.string.template.core.JsonPosition.EndOfStringTemplate;
-import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
@@ -91,16 +91,17 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 
         if (cursor < current.length()) {
             if (isWhitespace()) {
-                pos = new FragmnetPosition(index, cursor);
-                next = new JCWhitespace(current.charAt(cursor++), pos);
+                next = new JCWhitespace(current.charAt(cursor), new FragmentPosition(index, cursor));
+                pos = next.pos();
+                cursor++;
             } else {
-                pos = new FragmnetPosition(index, cursor);
-                next = new JCCh(current.charAt(cursor++), pos);
+                next = new JCCh(current.charAt(cursor), new FragmentPosition(index, cursor));
+                pos = next.pos();
+                cursor++;
             }
         } else {
             if (values.hasNext()) {
-                pos = new ValuePosition(index);
-                next = new JCObj(values.next(), pos);
+                next = new JCObj(values.next(), new ValuePosition(index));
             }
             if (fragments.hasNext()) {
                 readNextString();

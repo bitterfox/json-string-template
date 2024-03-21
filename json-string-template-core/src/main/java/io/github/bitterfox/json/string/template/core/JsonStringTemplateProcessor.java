@@ -31,10 +31,37 @@ public class JsonStringTemplateProcessor<JSON> implements StringTemplate.Process
     }
 
     public static <JSON> JsonStringTemplateProcessor<JSON> of(JsonBridge<JSON> jsonBridge) {
+        return ofV2(jsonBridge);
+    }
+
+    /**
+     * {@link #ofV1(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
+     * @param jsonBridge
+     * @return
+     * @param <JSON>
+     */
+    @Deprecated(forRemoval = true)
+    public static <JSON> JsonStringTemplateProcessor<JSON> ofV1(JsonBridge<JSON> jsonBridge) {
         return new JsonStringTemplateProcessor<>(
                 StringTemplate.Processor.of(stringTemplate -> {
-                    var parser = new JsonParser<JSON>(new JsonTokenizer(stringTemplate), jsonBridge);
+                    var parser = new JsonParserV1<>(new JsonTokenizer(stringTemplate), jsonBridge);
                     return parser.parseJson();
+                }));
+    }
+
+    /**
+     * {@link #ofV2(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
+     * @param jsonBridge
+     * @return
+     * @param <JSON>
+     */
+    @Deprecated(forRemoval = true)
+    public static <JSON> JsonStringTemplateProcessor<JSON> ofV2(JsonBridge<JSON> jsonBridge) {
+        return new JsonStringTemplateProcessor<>(
+                StringTemplate.Processor.of(stringTemplate -> {
+                    var parser = new JsonParserV2(new JsonTokenizer(stringTemplate));
+                    var compiler = new JsonCompiler<>(jsonBridge);
+                    return compiler.compile(parser.parseJson()).apply(stringTemplate.values());
                 }));
     }
 

@@ -29,20 +29,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.bitterfox.json.string.template.core.JsonPosition.FragmnetPosition;
+import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTComma;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTFalse;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTNull;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTNumber;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectClose;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
 class JsonTokenizerTest {
     public StringTemplate.Processor<List<JsonToken>, RuntimeException> JT =
@@ -80,20 +71,20 @@ class JsonTokenizerTest {
                         // L1
                         OBJECT_OPEN,
                         // L2
-                        new JTString("o1", range(0, 6, 1, 0)), COLON,
+                        new JTString(List.of("", ""), List.of(o1), range(0, 6, 1, 0)), COLON,
                         ARRAY_OPEN, new JTJavaObject(o2, valueAt(1)), COMMA, new JTJavaObject(o3, valueAt(2)), ARRAY_CLOSE, COMMA,
                         // L3
-                        new JTString("test", range(3, 8, 3, 13)), COLON, new JTNumber("1234", range(3, 16, 3, 19)), COMMA,
+                        new JTString(List.of("test"), List.of(), range(3, 8, 3, 13)), COLON, new JTNumber("1234", range(3, 16, 3, 19)), COMMA,
                         // L4
-                        new JTString("complex number", range(3, 26, 3, 41)), COLON, new JTNumber("-1234.84E+5", range(3, 44, 3, 54)), COMMA,
+                        new JTString(List.of("complex number"), List.of(), range(3, 26, 3, 41)), COLON, new JTNumber("-1234.84E+5", range(3, 44, 3, 54)), COMMA,
                         // L5
-                        new JTString("null", range(3, 61, 3, 66)), COLON, new JTJavaObject(o4, valueAt(3)), COMMA,
+                        new JTString(List.of("null"), List.of(), range(3, 61, 3, 66)), COLON, new JTJavaObject(o4, valueAt(3)), COMMA,
                         // L6
-                        new JTString("true", range(4, 6, 4, 11)), COLON, TRUE, COMMA,
+                        new JTString(List.of("true"), List.of(), range(4, 6, 4, 11)), COLON, TRUE, COMMA,
                         // L7
-                        new JTString("false", range(4, 24, 4, 30)), COLON, FALSE, COMMA,
+                        new JTString(List.of("false"), List.of(), range(4, 24, 4, 30)), COLON, FALSE, COMMA,
                         // L8
-                        new JTString("null", range(4, 44, 4, 49)), COLON, NULL,
+                        new JTString(List.of("null"), List.of(), range(4, 44, 4, 49)), COLON, NULL,
                         // L9
                         OBJECT_CLOSE
                 ),
@@ -101,7 +92,7 @@ class JsonTokenizerTest {
     }
 
     private JsonPositionRange range(int si, int sc, int ei, int ec) {
-        return new JsonPositionRange(new FragmnetPosition(si, sc), new FragmnetPosition(ei, ec));
+        return new JsonPositionRange(new FragmentPosition(si, sc), new FragmentPosition(ei, ec));
     }
 
     private ValuePosition valueAt(int i) {
