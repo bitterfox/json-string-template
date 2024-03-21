@@ -58,7 +58,7 @@ public class JsonCompiler<JSON> {
         visitor = new Visitor();
     }
 
-    CompiledJsonStringTemplate<JSON> compile(JsonAST root) {
+    public CompiledJsonStringTemplate<JSON> compile(JsonAST root) {
         return root.visit(visitor);
     }
 
