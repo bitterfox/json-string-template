@@ -34,7 +34,7 @@ class JsonStringTemplateProcessorTest {
             JsonStringTemplateProcessor.of(new JavaObjectJsonBridge());
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static class JavaObjectJsonBridge implements JsonBridge<Object> {
+    static class JavaObjectJsonBridge implements JsonBridge<Object> {
         @Override
         public Object createObject(Map<String, Object> object) {
             return object;

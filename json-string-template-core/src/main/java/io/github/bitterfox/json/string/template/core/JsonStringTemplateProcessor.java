@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, RuntimeException> {
     static <JSON> JsonStringTemplateProcessor<JSON> of(JsonBridge<JSON> jsonBridge) {
-        return ofV2(jsonBridge);
+        return ofV2Cached(jsonBridge);
     }
 
     /**
@@ -49,6 +49,17 @@ public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, Runti
     @Deprecated(forRemoval = true)
     static <JSON> JsonStringTemplateProcessor<JSON> ofV2(JsonBridge<JSON> jsonBridge) {
         return new JsonStringTemplateProcessorV2Impl<>(jsonBridge);
+    }
+
+    /**
+     * {@link #ofV2(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
+     * @param jsonBridge
+     * @return
+     * @param <JSON>
+     */
+    @Deprecated(forRemoval = true)
+    static <JSON> JsonStringTemplateProcessor<JSON> ofV2Cached(JsonBridge<JSON> jsonBridge) {
+        return new JsonStringTemplateProcessorV2CachedImpl<>(jsonBridge);
     }
 
     JSON process(StringTemplate stringTemplate);
