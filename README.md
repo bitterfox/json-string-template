@@ -58,9 +58,9 @@ First, add one of the bridge libraries mentioned above to your project.
 // build.gradle.kts
 
 dependencies {
-  implementation("io.github.bitterfox:json-string-template-jakarta-json:0.21.1")
-  implementation("io.github.bitterfox:json-string-template-org-json:0.21.1")
-  implementation("io.github.bitterfox:json-string-template-jackson:0.21.1")
+  implementation("io.github.bitterfox:json-string-template-jakarta-json:0.21.2")
+  implementation("io.github.bitterfox:json-string-template-org-json:0.21.2")
+  implementation("io.github.bitterfox:json-string-template-jackson:0.21.2")
 }
 ```
 
