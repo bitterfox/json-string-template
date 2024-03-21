@@ -15,7 +15,7 @@ allprojects {
 
     group = "io.github.bitterfox"
     // 0.<java version>.<minor version>
-    version = "0.21.2-SNAPSHOT"
+    version = "0.21.2"
 
     dependencies {
         testImplementation(platform("org.junit:junit-bom:5.9.1"))
