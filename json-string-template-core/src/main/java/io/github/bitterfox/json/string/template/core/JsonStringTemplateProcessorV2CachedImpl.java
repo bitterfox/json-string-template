@@ -40,6 +40,7 @@ public class JsonStringTemplateProcessorV2CachedImpl<JSON> implements JsonString
     private final AtomicInteger cacheHit = new AtomicInteger();
     private final AtomicInteger cacheEvicted = new AtomicInteger();
 
+    // Java uses the same instance of fragments of String Template expr?
     private static class CacheKey {
         private final List<String> fragments;
 
