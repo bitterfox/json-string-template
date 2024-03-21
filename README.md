@@ -1,9 +1,9 @@
 # json-string-template
 
-![Static Badge](https://img.shields.io/badge/Java-21-blue)
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.bitterfox/json-string-template-core)
-![GitHub License](https://img.shields.io/github/license/bitterfox/json-string-template)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/bitterfox/json-string-template/gradle.yml)
+[![Static Badge](https://img.shields.io/badge/Java-21-blue)](https://jdk.java.net/21/)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.bitterfox/json-string-template-core)](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-core)
+[![GitHub License](https://img.shields.io/github/license/bitterfox/json-string-template)](https://www.apache.org/licenses/LICENSE-2.0)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/bitterfox/json-string-template/gradle.yml)](https://github.com/bitterfox/json-string-template/actions/workflows/gradle.yml)
 
 Java 21 introduced the [String Template](https://openjdk.org/jeps/430) feature as a new preview feature.
 This feature allows users to create String literals with embedded expressions.
