@@ -2,6 +2,7 @@ import net.thebugmc.gradle.sonatypepublisher.PublishingType.USER_MANAGED
 
 plugins {
     id("java")
+    id("java-library")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
 }
 
@@ -40,6 +41,7 @@ allprojects {
 }
 
 subprojects {
+    apply(plugin = "java-library")
     apply(plugin = "net.thebugmc.gradle.sonatype-central-portal-publisher")
 
     signing {
