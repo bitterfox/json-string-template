@@ -33,7 +33,7 @@ class JsonStringTemplateProcessorV2CachedImplTest {
     @Test
     void test() {
         JsonStringTemplateProcessorV2CachedImpl<Object> JSON =
-                new JsonStringTemplateProcessorV2CachedImpl<>(new JavaObjectJsonBridge());
+                new JsonStringTemplateProcessorV2CachedImpl<>(new JavaObjectJsonBridge(), JsonStringTemplateConfiguration.ofDefault());
 
         for (int i = 0; i < 1000; i++) {
             Object o = JSON."""

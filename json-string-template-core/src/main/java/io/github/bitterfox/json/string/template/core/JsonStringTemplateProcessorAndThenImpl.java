@@ -23,18 +23,17 @@ package io.github.bitterfox.json.string.template.core;
 
 import java.util.function.Function;
 
-public class JsonStringTemplateProcessorAndThenImpl<JSON, U> implements JsonStringTemplateProcessor<U> {
-    private final JsonStringTemplateProcessor<JSON> processor;
-    private final Function<? super JSON, ? extends U> function;
-
-    public JsonStringTemplateProcessorAndThenImpl(
-            JsonStringTemplateProcessor<JSON> processor, Function<? super JSON, ? extends U> function) {
-        this.processor = processor;
-        this.function = function;
+public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
+        JsonStringTemplateProcessor<JSON> processor,
+        Function<? super JSON, ? extends U> function
+) implements JsonStringTemplateProcessor<U> {
+    @Override
+    public U process(StringTemplate stringTemplate) {
+        return function.apply(processor.process(stringTemplate));
     }
 
     @Override
-    public U process(StringTemplate stringTemplate) throws RuntimeException {
-        return function.apply(processor.process(stringTemplate));
+    public JsonStringTemplateConfiguration configuration() {
+        return processor.configuration();
     }
 }

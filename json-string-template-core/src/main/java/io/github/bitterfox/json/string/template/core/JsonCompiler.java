@@ -44,14 +44,16 @@ import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPositi
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public class JsonCompiler<JSON> {
-    private JsonBridge<JSON> jsonBridge;
+    private final JsonBridge<JSON> jsonBridge;
+    private final JsonStringTemplateConfiguration config;
     private final JSON TRUE;
     private final JSON FALSE;
     private final JSON NULL;
     private final Visitor visitor;
 
-    public JsonCompiler(JsonBridge<JSON> jsonBridge) {
+    public JsonCompiler(JsonBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
         this.jsonBridge = jsonBridge;
+        this.config = config;
         TRUE = jsonBridge.createTrue();
         FALSE = jsonBridge.createFalse();
         NULL = jsonBridge.createNull();

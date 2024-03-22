@@ -37,7 +37,7 @@ import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 class JsonCharacterIteratorTest {
     public StringTemplate.Processor<List<JsonCharacter>, RuntimeException> JC =
             StringTemplate.Processor.of(t -> {
-                var i = new JsonCharacterIterator(t);
+                var i = new JsonCharacterIterator(t, JsonStringTemplateConfiguration.ofDefault());
                 var l = new ArrayList<JsonCharacter>();
                 while (i.hasNext()) {
                     l.add(i.next());

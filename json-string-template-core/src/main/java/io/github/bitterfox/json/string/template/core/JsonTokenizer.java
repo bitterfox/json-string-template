@@ -44,15 +44,17 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 public class JsonTokenizer implements Iterator<JsonToken> {
     private JsonCharacterIterator iterator;
     private JsonToken next;
+    private final JsonStringTemplateConfiguration config;
 
-    private JsonTokenizer(JsonCharacterIterator iterator) {
+    private JsonTokenizer(JsonCharacterIterator iterator, JsonStringTemplateConfiguration config) {
         this.iterator = iterator;
+        this.config = config;
         readNext();
     }
 
 
-    public JsonTokenizer(StringTemplate template) {
-        this(new JsonCharacterIterator(template));
+    public JsonTokenizer(StringTemplate template, JsonStringTemplateConfiguration config) {
+        this(new JsonCharacterIterator(template, config), config);
     }
 
     @Override

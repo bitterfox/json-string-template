@@ -21,20 +21,15 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-import java.util.function.Function;
+public abstract class AbstractJsonStringTemplateProcessor<JSON> implements JsonStringTemplateProcessor<JSON> {
+    protected final JsonStringTemplateConfiguration config;
 
-public class JsonStringTemplateProcessorV1Impl<JSON> extends AbstractJsonStringTemplateProcessor<JSON> {
-    private final JsonBridge<JSON> jsonBridge;
-
-    public JsonStringTemplateProcessorV1Impl(JsonBridge<JSON> jsonBridge,
-                                             JsonStringTemplateConfiguration config) {
-        super(config);
-        this.jsonBridge = jsonBridge;
+    public AbstractJsonStringTemplateProcessor(JsonStringTemplateConfiguration config) {
+        this.config = config;
     }
 
     @Override
-    public JSON process(StringTemplate stringTemplate) throws RuntimeException {
-        var parser = new JsonParserV1<>(new JsonTokenizer(stringTemplate, config), jsonBridge, config);
-        return parser.parseJson();
+    public JsonStringTemplateConfiguration configuration() {
+        return config;
     }
 }

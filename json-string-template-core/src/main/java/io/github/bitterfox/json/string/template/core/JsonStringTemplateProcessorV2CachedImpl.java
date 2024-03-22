@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class JsonStringTemplateProcessorV2CachedImpl<JSON> implements JsonStringTemplateProcessor<JSON> {
+public class JsonStringTemplateProcessorV2CachedImpl<JSON> extends AbstractJsonStringTemplateProcessor<JSON> {
     // TODO Make this configurable
     private static final int CACHE_SIZE_LIMIT = 1000;
 
@@ -62,8 +62,9 @@ public class JsonStringTemplateProcessorV2CachedImpl<JSON> implements JsonString
         }
     }
 
-    public JsonStringTemplateProcessorV2CachedImpl(JsonBridge<JSON> compileEngine) {
-        this.compileEngine = new JsonStringTemplateProcessorV2Impl<>(compileEngine);
+    public JsonStringTemplateProcessorV2CachedImpl(JsonBridge<JSON> compileEngine, JsonStringTemplateConfiguration config) {
+        super(config);
+        this.compileEngine = new JsonStringTemplateProcessorV2Impl<>(compileEngine, config);
         // synchronizedMap uses synchronized
         // This is not good for virtual thread, Java 21+
         // Let's consider read/write lock or implement concurrent LRU cache

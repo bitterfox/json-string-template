@@ -38,7 +38,7 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
 class JsonTokenizerTest {
     public StringTemplate.Processor<List<JsonToken>, RuntimeException> JT =
             StringTemplate.Processor.of(t -> {
-                var i = new JsonTokenizer(t);
+                var i = new JsonTokenizer(t, JsonStringTemplateConfiguration.ofDefault());
                 var l = new ArrayList<JsonToken>();
                 while (i.hasNext()) {
                     l.add(i.next());

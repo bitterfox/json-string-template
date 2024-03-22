@@ -47,7 +47,7 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
-public record JsonParserV2(JsonTokenizer tokenizer) {
+public record JsonParserV2(JsonTokenizer tokenizer, JsonStringTemplateConfiguration config) {
     public JsonAST parseJson() {
         return parseValue();
     }

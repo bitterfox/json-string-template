@@ -53,7 +53,7 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
         readNext();
     }
 
-    public JsonCharacterIterator(StringTemplate template) {
+    public JsonCharacterIterator(StringTemplate template, JsonStringTemplateConfiguration config) {
         this(template.fragments(), template.values());
     }
 

@@ -40,15 +40,11 @@ import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
-public class JsonParserV1<JSON> {
-    private final JsonTokenizer tokenizer;
-    private final JsonBridge<JSON> jsonBridge;
-
-    public JsonParserV1(JsonTokenizer tokenizer, JsonBridge<JSON> jsonBridge) {
-        this.tokenizer = tokenizer;
-        this.jsonBridge = jsonBridge;
-    }
-
+public record JsonParserV1<JSON>(
+        JsonTokenizer tokenizer,
+        JsonBridge<JSON> jsonBridge,
+        JsonStringTemplateConfiguration config
+) {
     public JSON parseJson() {
         return parseValue();
     }
