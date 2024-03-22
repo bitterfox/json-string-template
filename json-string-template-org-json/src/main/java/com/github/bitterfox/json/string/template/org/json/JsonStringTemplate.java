@@ -24,6 +24,7 @@ package com.github.bitterfox.json.string.template.org.json;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateConfiguration;
 import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 public class JsonStringTemplate {
@@ -31,4 +32,9 @@ public class JsonStringTemplate {
             JsonStringTemplateProcessor.of(new OrgJsonJsonBridge());
     public static final JsonStringTemplateProcessor<JSONObject> JSON_O = JSON.andThen(JSONObject.class::cast);
     public static final JsonStringTemplateProcessor<JSONArray> JSON_A = JSON.andThen(JSONArray.class::cast);
+
+    private static final JsonStringTemplateProcessor<Object> JSON_SPEC =
+            JsonStringTemplateProcessor.of(new OrgJsonJsonBridge(), JsonStringTemplateConfiguration.JSON_SPEC);
+    public static final JsonStringTemplateProcessor<JSONObject> JSON_SPEC_O = JSON_SPEC.andThen(JSONObject.class::cast);
+    public static final JsonStringTemplateProcessor<JSONArray> JSON_SPEC_A = JSON_SPEC.andThen(JSONArray.class::cast);
 }

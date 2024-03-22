@@ -23,6 +23,8 @@ package io.github.bitterfox.json.string.template.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateConfiguration;
 import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 public class JsonStringTemplate {
@@ -30,4 +32,9 @@ public class JsonStringTemplate {
 
     public static final JsonStringTemplateProcessor<JsonNode> JSON =
             JsonStringTemplateProcessor.of(new JacksonJsonBridge(DEFAULT_MAPPER));
+
+    public static final JsonStringTemplateProcessor<JsonNode> JSON_SPEC =
+            JsonStringTemplateProcessor.of(
+                    new JacksonJsonBridge(DEFAULT_MAPPER),
+                    JsonStringTemplateConfiguration.JSON_SPEC);
 }

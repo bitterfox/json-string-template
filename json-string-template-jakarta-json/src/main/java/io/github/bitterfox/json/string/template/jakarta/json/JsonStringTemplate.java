@@ -22,6 +22,7 @@
 package io.github.bitterfox.json.string.template.jakarta.json;
 
 
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateConfiguration;
 import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessor;
 
 import jakarta.json.JsonArray;
@@ -33,4 +34,10 @@ public class JsonStringTemplate {
             JsonStringTemplateProcessor.of(new JakartaJsonJsonBridge());
     public static final JsonStringTemplateProcessor<JsonObject> JSON_O = JSON.andThen(JsonValue::asJsonObject);
     public static final JsonStringTemplateProcessor<JsonArray> JSON_A = JSON.andThen(JsonValue::asJsonArray);
+
+
+    public static final JsonStringTemplateProcessor<JsonValue> JSON_SPEC =
+            JsonStringTemplateProcessor.of(new JakartaJsonJsonBridge(), JsonStringTemplateConfiguration.JSON_SPEC);
+    public static final JsonStringTemplateProcessor<JsonObject> JSON_SPEC_O = JSON_SPEC.andThen(JsonValue::asJsonObject);
+    public static final JsonStringTemplateProcessor<JsonArray> JSON_SPEC_A = JSON_SPEC.andThen(JsonValue::asJsonArray);
 }
