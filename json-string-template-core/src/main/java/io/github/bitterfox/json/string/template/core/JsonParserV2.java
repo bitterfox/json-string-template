@@ -22,13 +22,9 @@
 package io.github.bitterfox.json.string.template.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTArray;
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTJavaObject;
@@ -65,14 +61,22 @@ public record JsonParserV2(JsonTokenizer tokenizer, JsonStringTemplateConfigurat
         accept(JsonToken.OBJECT_OPEN);
 
         List<Entry<JsonAST, JsonAST>> fields = new ArrayList<>();
-        while (!(tokenizer.peek() instanceof JTObjectClose)) {
+        while (true) {
+            if (extendJsonSpecAllowsExtraComma()) {
+                break;
+            }
+
+            if (fields.isEmpty() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                break;
+            }
+
             JsonAST key = parseString();
             accept(JsonToken.COLON);
             JsonAST value = parseValue();
             fields.add(Map.entry(key, value));
 
             if (tokenizer.peek() instanceof JTObjectClose) {
-                // do nothing
+                break;
             } else {
                 accept(JsonToken.COMMA);
             }
@@ -80,6 +84,18 @@ public record JsonParserV2(JsonTokenizer tokenizer, JsonStringTemplateConfigurat
 
         accept(JsonToken.OBJECT_CLOSE);
         return new JASTObject(fields);
+    }
+
+    private boolean extendJsonSpecAllowsExtraComma() {
+        if (config.extraCommaAllowed()) {
+            while (tokenizer.peek() instanceof JsonToken.JTComma) {
+                tokenizer.next();
+            }
+            if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private JsonAST parseArray() {

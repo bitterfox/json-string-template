@@ -33,15 +33,25 @@ public abstract class AbstractJsonStringTemplateProcessor<JSON> implements JsonS
         return config;
     }
 
+    protected abstract JsonStringTemplateProcessor<JSON> withConfiguration(JsonStringTemplateConfiguration config);
+
     @Override
     public boolean cacheEnabled() {
         return config.cacheEnabled();
     }
 
-    protected abstract JsonStringTemplateProcessor<JSON> withConfiguration(JsonStringTemplateConfiguration config);
-
     @Override
     public JsonStringTemplateProcessor<JSON> withCacheEnabled(boolean cacheEnabled) {
         return withConfiguration(config.withCacheEnabled(cacheEnabled));
+    }
+
+    @Override
+    public boolean extraCommaAllowed() {
+        return config.extraCommaAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<JSON> withExtraCommaAllowed(boolean extraCommaAllowed) {
+        return withConfiguration(config.withExtraCommaAllowed(extraCommaAllowed));
     }
 }

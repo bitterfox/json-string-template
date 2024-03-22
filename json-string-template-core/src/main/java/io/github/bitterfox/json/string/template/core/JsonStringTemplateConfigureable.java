@@ -30,4 +30,13 @@ public interface JsonStringTemplateConfigureable<THIS> {
         return withCacheEnabled(false);
     }
     THIS withCacheEnabled(boolean cacheEnabled);
+
+    boolean extraCommaAllowed();
+    default THIS allowExtraComma() {
+        return withExtraCommaAllowed(true);
+    }
+    default THIS disallowExtraComma() {
+        return withExtraCommaAllowed(false);
+    }
+    THIS withExtraCommaAllowed(boolean extraCommaAllowed);
 }

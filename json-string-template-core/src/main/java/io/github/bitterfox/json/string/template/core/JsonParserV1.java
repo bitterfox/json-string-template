@@ -62,7 +62,15 @@ public record JsonParserV1<JSON>(
         accept(JsonToken.OBJECT_OPEN);
 
         Map<String, JSON> object = new HashMap<>();
-        while (!(tokenizer.peek() instanceof JTObjectClose)) {
+        while (true) {
+            if (extendJsonSpecAllowsExtraComma()) {
+                break;
+            }
+
+            if (object.isEmpty() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                break;
+            }
+
             String key = parseString();
             accept(JsonToken.COLON);
             JSON value = parseValue();
@@ -73,7 +81,7 @@ public record JsonParserV1<JSON>(
             object.put(key, value);
 
             if (tokenizer.peek() instanceof JTObjectClose) {
-                // do nothing
+                break;
             } else {
                 accept(JsonToken.COMMA);
             }
@@ -81,6 +89,18 @@ public record JsonParserV1<JSON>(
 
         accept(JsonToken.OBJECT_CLOSE);
         return jsonBridge.createObject(object);
+    }
+
+    private boolean extendJsonSpecAllowsExtraComma() {
+        if (config.extraCommaAllowed()) {
+            while (tokenizer.peek() instanceof JsonToken.JTComma) {
+                tokenizer.next();
+            }
+            if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private JSON parseArray() {

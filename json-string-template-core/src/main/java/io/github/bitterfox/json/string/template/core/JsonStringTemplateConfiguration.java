@@ -22,19 +22,36 @@
 package io.github.bitterfox.json.string.template.core;
 
 public record JsonStringTemplateConfiguration(
-        boolean cacheEnabled
+        boolean cacheEnabled,
+        boolean extraCommaAllowed
 ) implements JsonStringTemplateConfigureable<JsonStringTemplateConfiguration> {
     public static final JsonStringTemplateConfiguration DEFAULT = new JsonStringTemplateConfiguration(
+            true,
             true);
+    public static final JsonStringTemplateConfiguration JSON_SPEC =
+            DEFAULT.disallowExtraComma();
 
     public static JsonStringTemplateConfiguration ofDefault() {
         return DEFAULT;
     }
 
+    public static JsonStringTemplateConfiguration ofJsonSpec() {
+        return JSON_SPEC;
+    }
+
     @Override
     public JsonStringTemplateConfiguration withCacheEnabled(boolean cacheEnabled) {
         return new JsonStringTemplateConfiguration(
-                cacheEnabled
+                cacheEnabled,
+                extraCommaAllowed
+        );
+    }
+
+    @Override
+    public JsonStringTemplateConfiguration withExtraCommaAllowed(boolean extraCommaAllowed) {
+        return new JsonStringTemplateConfiguration(
+                cacheEnabled,
+                extraCommaAllowed
         );
     }
 }

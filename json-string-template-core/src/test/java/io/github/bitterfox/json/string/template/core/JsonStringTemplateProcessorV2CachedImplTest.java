@@ -21,15 +21,19 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.bitterfox.json.string.template.core.JsonStringTemplateProcessorTest.JavaObjectJsonBridge;
+class JsonStringTemplateProcessorV2CachedImplTest extends AbstractJsonStringTemplateProcessorTest {
+    @SuppressWarnings("removal")
+    public JsonStringTemplateProcessorV2CachedImplTest() {
+        super(JsonStringTemplateProcessor.ofV2Cached(new JavaObjectJsonBridge()));
+    }
 
-class JsonStringTemplateProcessorV2CachedImplTest {
     @Test
     void test() {
         JsonStringTemplateProcessorV2CachedImpl<Object> JSON =

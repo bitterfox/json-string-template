@@ -46,4 +46,14 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
     public JsonStringTemplateProcessor<U> withCacheEnabled(boolean cacheEnabled) {
         return new JsonStringTemplateProcessorAndThenImpl<>(processor.withCacheEnabled(cacheEnabled), function);
     }
+
+    @Override
+    public boolean extraCommaAllowed() {
+        return processor.extraCommaAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<U> withExtraCommaAllowed(boolean extraCommaAllowed) {
+        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withExtraCommaAllowed(extraCommaAllowed), function);
+    }
 }

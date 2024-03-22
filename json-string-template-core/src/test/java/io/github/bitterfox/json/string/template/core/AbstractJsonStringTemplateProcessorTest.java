@@ -21,7 +21,8 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,9 +30,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-class JsonStringTemplateProcessorTest {
-    private StringTemplate.Processor<Object, RuntimeException> JSON =
-            JsonStringTemplateProcessor.of(new JavaObjectJsonBridge());
+abstract class AbstractJsonStringTemplateProcessorTest {
+    protected JsonStringTemplateProcessor<Object> JSON;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     static class JavaObjectJsonBridge implements JsonBridge<Object> {
@@ -85,6 +85,10 @@ class JsonStringTemplateProcessorTest {
         public Object convertToJsonObject(Object o) {
             return null;
         }
+    }
+
+    public AbstractJsonStringTemplateProcessorTest(JsonStringTemplateProcessor<Object> JSON) {
+        this.JSON = JSON;
     }
 
     @Test
@@ -143,7 +147,6 @@ class JsonStringTemplateProcessorTest {
 
     @Test
     void testNumbers() {
-
         Object json = JSON."""
                 {
                     "number1": 0.1234,
@@ -156,5 +159,62 @@ class JsonStringTemplateProcessorTest {
                        "number2", new BigDecimal("1.2345E-10")
                 ),
                 json);
+    }
+
+    @Test
+    void testExtraCommaAllowed() {
+        Object json;
+        json = JSON."""
+                {
+                    ,,,
+                }
+                """;
+        json = JSON."""
+                {
+                    ,,,
+                    "test": "hoge",,,
+                    "test2": "foo",,,
+                }
+                """;
+    }
+
+    @Test
+    void testExtraCommaNotAllowed() {
+        var JSON = this.JSON.disallowExtraComma();
+        Object json;
+        try {
+            json = JSON."""
+                    {
+                        ,
+                    }
+                    """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                {
+                    "test": "hoge",,
+                    "test2": "foo"
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                {
+                    "test": "hoge",
+                    "test2": "foo",,
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
     }
 }
