@@ -21,10 +21,20 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-public record JsonStringTemplateConfiguration() {
-    public static final JsonStringTemplateConfiguration DEFAULT = new JsonStringTemplateConfiguration();
+public record JsonStringTemplateConfiguration(
+        boolean cacheEnabled
+) implements JsonStringTemplateConfigureable<JsonStringTemplateConfiguration> {
+    public static final JsonStringTemplateConfiguration DEFAULT = new JsonStringTemplateConfiguration(
+            true);
 
     public static JsonStringTemplateConfiguration ofDefault() {
         return DEFAULT;
+    }
+
+    @Override
+    public JsonStringTemplateConfiguration withCacheEnabled(boolean cacheEnabled) {
+        return new JsonStringTemplateConfiguration(
+                cacheEnabled
+        );
     }
 }

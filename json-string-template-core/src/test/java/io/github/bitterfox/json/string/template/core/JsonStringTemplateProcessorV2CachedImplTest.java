@@ -48,4 +48,27 @@ class JsonStringTemplateProcessorV2CachedImplTest {
         assertEquals(999, JSON.cacheHit());
         assertEquals(0, JSON.cacheEvicted());
     }
+
+    @Test
+    void testCacheDisabled() {
+        JsonStringTemplateProcessorV2CachedImpl<Object> JSON =
+                new JsonStringTemplateProcessorV2CachedImpl<>(
+                        new JavaObjectJsonBridge(),
+                        JsonStringTemplateConfiguration.ofDefault()
+                                                       .disableCache());
+
+        for (int i = 0; i < 1000; i++) {
+            Object o = JSON."""
+                    {
+                        "test": \{i}
+                    }
+                    """;
+            assertEquals(Map.of("test", i), o);
+        }
+
+        assertNull(JSON.cache);
+        assertEquals(0, JSON.cacheMiss());
+        assertEquals(0, JSON.cacheHit());
+        assertEquals(0, JSON.cacheEvicted());
+    }
 }

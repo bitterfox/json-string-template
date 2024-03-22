@@ -24,7 +24,7 @@ package io.github.bitterfox.json.string.template.core;
 import java.lang.StringTemplate.Processor;
 import java.util.function.Function;
 
-public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, RuntimeException> {
+public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, RuntimeException>, JsonStringTemplateConfigureable<JsonStringTemplateProcessor<JSON>> {
     static <JSON> JsonStringTemplateProcessor<JSON> of(JsonBridge<JSON> jsonBridge) {
         return of(jsonBridge, JsonStringTemplateConfiguration.ofDefault());
     }

@@ -32,4 +32,16 @@ public abstract class AbstractJsonStringTemplateProcessor<JSON> implements JsonS
     public JsonStringTemplateConfiguration configuration() {
         return config;
     }
+
+    @Override
+    public boolean cacheEnabled() {
+        return config.cacheEnabled();
+    }
+
+    protected abstract JsonStringTemplateProcessor<JSON> withConfiguration(JsonStringTemplateConfiguration config);
+
+    @Override
+    public JsonStringTemplateProcessor<JSON> withCacheEnabled(boolean cacheEnabled) {
+        return withConfiguration(config.withCacheEnabled(cacheEnabled));
+    }
 }

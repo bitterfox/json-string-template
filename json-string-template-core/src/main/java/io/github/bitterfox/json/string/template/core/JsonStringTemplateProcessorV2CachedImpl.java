@@ -26,19 +26,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JsonStringTemplateProcessorV2CachedImpl<JSON> extends AbstractJsonStringTemplateProcessor<JSON> {
     // TODO Make this configurable
     private static final int CACHE_SIZE_LIMIT = 1000;
 
+    private final JsonBridge<JSON> jsonBridge;
     private final JsonStringTemplateProcessorV2Impl<JSON> compileEngine;
-    private final Map<CacheKey, CompiledJsonStringTemplate<JSON>> cache;
+    @VisibleForTesting
+    final Map<CacheKey, CompiledJsonStringTemplate<JSON>> cache;
 
     private final AtomicInteger cacheMiss = new AtomicInteger();
     private final AtomicInteger cacheHit = new AtomicInteger();
     private final AtomicInteger cacheEvicted = new AtomicInteger();
+
 
     // Java uses the same instance of fragments of String Template expr?
     private static class CacheKey {
@@ -62,28 +64,35 @@ public class JsonStringTemplateProcessorV2CachedImpl<JSON> extends AbstractJsonS
         }
     }
 
-    public JsonStringTemplateProcessorV2CachedImpl(JsonBridge<JSON> compileEngine, JsonStringTemplateConfiguration config) {
+    public JsonStringTemplateProcessorV2CachedImpl(JsonBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
         super(config);
-        this.compileEngine = new JsonStringTemplateProcessorV2Impl<>(compileEngine, config);
+        this.jsonBridge = jsonBridge;
+        compileEngine = new JsonStringTemplateProcessorV2Impl<>(jsonBridge, config);
         // synchronizedMap uses synchronized
         // This is not good for virtual thread, Java 21+
         // Let's consider read/write lock or implement concurrent LRU cache
-        cache = Collections.synchronizedMap(
-                new LinkedHashMap<>(16, 0.75f, false) {
-                    @Override
-                    protected boolean removeEldestEntry(
-                            Entry<CacheKey, CompiledJsonStringTemplate<JSON>> eldest) {
-                        if (size() > CACHE_SIZE_LIMIT) {
-                            cacheEvicted.incrementAndGet();
-                            return true;
+        cache = config.cacheEnabled()
+                ? Collections.synchronizedMap(
+                    new LinkedHashMap<>(16, 0.75f, false) {
+                        @Override
+                        protected boolean removeEldestEntry(
+                                Entry<CacheKey, CompiledJsonStringTemplate<JSON>> eldest) {
+                            if (size() > CACHE_SIZE_LIMIT) {
+                                cacheEvicted.incrementAndGet();
+                                return true;
+                            }
+                            return false;
                         }
-                        return false;
-                    }
-                });
+                    })
+                : null;
     }
 
     @Override
     public JSON process(StringTemplate stringTemplate) {
+        if (cache == null) {
+            return compileEngine.process(stringTemplate);
+        }
+
         return cache.compute(new CacheKey(stringTemplate.fragments()), (_, cached) -> {
             if (cached == null) {
                 cacheMiss.incrementAndGet();
@@ -103,5 +112,10 @@ public class JsonStringTemplateProcessorV2CachedImpl<JSON> extends AbstractJsonS
     }
     public int cacheEvicted() {
         return cacheEvicted.get();
+    }
+
+    @Override
+    protected JsonStringTemplateProcessor<JSON> withConfiguration(JsonStringTemplateConfiguration config) {
+        return new JsonStringTemplateProcessorV2CachedImpl<>(jsonBridge, config);
     }
 }

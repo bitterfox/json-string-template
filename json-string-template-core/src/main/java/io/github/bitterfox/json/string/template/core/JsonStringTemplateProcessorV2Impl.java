@@ -22,11 +22,12 @@
 package io.github.bitterfox.json.string.template.core;
 
 public class JsonStringTemplateProcessorV2Impl<JSON> extends AbstractJsonStringTemplateProcessor<JSON> {
+    private final JsonBridge<JSON> jsonBridge;
     private final JsonCompiler<JSON> compiler;
 
-    public JsonStringTemplateProcessorV2Impl(
-            JsonBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
+    public JsonStringTemplateProcessorV2Impl(JsonBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
         super(config);
+        this.jsonBridge = jsonBridge;
         compiler = new JsonCompiler<>(jsonBridge, config);
     }
 
@@ -38,5 +39,10 @@ public class JsonStringTemplateProcessorV2Impl<JSON> extends AbstractJsonStringT
     public CompiledJsonStringTemplate<JSON> compile(StringTemplate stringTemplate) {
         var parser = new JsonParserV2(new JsonTokenizer(stringTemplate, config), config);
         return compiler.compile(parser.parseJson());
+    }
+
+    @Override
+    protected JsonStringTemplateProcessor<JSON> withConfiguration(JsonStringTemplateConfiguration config) {
+        return new JsonStringTemplateProcessorV2Impl<>(jsonBridge, config);
     }
 }

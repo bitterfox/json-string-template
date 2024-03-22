@@ -21,29 +21,13 @@
 
 package io.github.bitterfox.json.string.template.core;
 
-import java.util.function.Function;
-
-public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
-        JsonStringTemplateProcessor<JSON> processor,
-        Function<? super JSON, ? extends U> function
-) implements JsonStringTemplateProcessor<U> {
-    @Override
-    public U process(StringTemplate stringTemplate) {
-        return function.apply(processor.process(stringTemplate));
+public interface JsonStringTemplateConfigureable<THIS> {
+    boolean cacheEnabled();
+    default THIS enableCache() {
+        return withCacheEnabled(true);
     }
-
-    @Override
-    public JsonStringTemplateConfiguration configuration() {
-        return processor.configuration();
+    default THIS disableCache() {
+        return withCacheEnabled(false);
     }
-
-    @Override
-    public boolean cacheEnabled() {
-        return processor.cacheEnabled();
-    }
-
-    @Override
-    public JsonStringTemplateProcessor<U> withCacheEnabled(boolean cacheEnabled) {
-        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withCacheEnabled(cacheEnabled), function);
-    }
+    THIS withCacheEnabled(boolean cacheEnabled);
 }
