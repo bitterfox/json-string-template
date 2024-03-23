@@ -24,15 +24,19 @@ package io.github.bitterfox.json.string.template.core;
 public record JsonStringTemplateConfiguration(
         boolean cacheEnabled,
         boolean tailingCommaAllowed,
-        boolean extraCommaAllowed
+        boolean extraCommaAllowed,
+        boolean commentAllowed
 ) implements JsonStringTemplateConfigureable<JsonStringTemplateConfiguration> {
     public static final JsonStringTemplateConfiguration DEFAULT = new JsonStringTemplateConfiguration(
             true,
             true,
-            true);
+            true,
+            true
+    );
     public static final JsonStringTemplateConfiguration JSON_SPEC =
             DEFAULT.disallowTailingComma()
-                   .disallowExtraComma();
+                   .disallowExtraComma()
+                   .disallowComment();
 
     public static JsonStringTemplateConfiguration ofDefault() {
         return DEFAULT;
@@ -47,7 +51,8 @@ public record JsonStringTemplateConfiguration(
         return new JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
-                extraCommaAllowed
+                extraCommaAllowed,
+                commentAllowed
         );
     }
 
@@ -56,7 +61,8 @@ public record JsonStringTemplateConfiguration(
         return new JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
-                extraCommaAllowed
+                extraCommaAllowed,
+                commentAllowed
         );
     }
 
@@ -65,7 +71,18 @@ public record JsonStringTemplateConfiguration(
         return new JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
-                extraCommaAllowed
+                extraCommaAllowed,
+                commentAllowed
+        );
+    }
+
+    @Override
+    public JsonStringTemplateConfiguration withCommentAllowed(boolean commentAllowed) {
+        return new JsonStringTemplateConfiguration(
+                cacheEnabled,
+                tailingCommaAllowed,
+                extraCommaAllowed,
+                commentAllowed
         );
     }
 }

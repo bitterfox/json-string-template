@@ -327,4 +327,39 @@ abstract class AbstractJsonStringTemplateProcessorTest {
             // ok
         }
     }
+
+    @Test
+    void testCommentAllowed() {
+        String name = "name";
+        String text = """
+                hello
+                world
+                """;
+        int number = 1234;
+
+        Object json = JSON."""
+                {
+                    /**
+                     * This field is name
+                     * *\\/ <- Note that this is not end of block comment (/ is escaped)
+                     */ // combination with single line comment
+                    \{name}: \{text}, // we can write comment here
+                    "number\{name}": \{number},
+                    // single line comment
+                    "boolean": true,
+                    // single line comment
+                    // continuing multi line
+                    "array": \{List.of(1, 2, 3)}
+                }
+
+                // comment at the end""";
+
+        assertEquals(
+                Map.of("name", text,
+                       "numbername", number,
+                       "boolean", true,
+                       "array", List.of(1, 2, 3)
+                ),
+                json);
+    }
 }

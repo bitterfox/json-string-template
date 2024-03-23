@@ -37,6 +37,10 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
         return processor.configuration();
     }
 
+    private JsonStringTemplateProcessor<U> withProcessor(JsonStringTemplateProcessor<JSON> processor) {
+        return new JsonStringTemplateProcessorAndThenImpl<>(processor, function);
+    }
+
     @Override
     public boolean cacheEnabled() {
         return processor.cacheEnabled();
@@ -44,7 +48,7 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
 
     @Override
     public JsonStringTemplateProcessor<U> withCacheEnabled(boolean cacheEnabled) {
-        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withCacheEnabled(cacheEnabled), function);
+        return withProcessor(processor.withCacheEnabled(cacheEnabled));
     }
 
     @Override
@@ -54,7 +58,7 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
 
     @Override
     public JsonStringTemplateProcessor<U> withTailingCommaAllowed(boolean tailingCommaAllowed) {
-        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withTailingCommaAllowed(tailingCommaAllowed), function);
+        return withProcessor(processor.withTailingCommaAllowed(tailingCommaAllowed));
     }
 
     @Override
@@ -64,6 +68,16 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
 
     @Override
     public JsonStringTemplateProcessor<U> withExtraCommaAllowed(boolean extraCommaAllowed) {
-        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withExtraCommaAllowed(extraCommaAllowed), function);
+        return withProcessor(processor.withExtraCommaAllowed(extraCommaAllowed));
+    }
+
+    @Override
+    public boolean commentAllowed() {
+        return processor.commentAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<U> withCommentAllowed(boolean commentAllowed) {
+        return withProcessor(processor.withCommentAllowed(commentAllowed));
     }
 }

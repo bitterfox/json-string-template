@@ -28,18 +28,9 @@ import java.util.List;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayClose;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTArrayOpen;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTColon;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTComma;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTFalse;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTNull;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTNumber;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectClose;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTObjectOpen;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
-import io.github.bitterfox.json.string.template.core.JsonToken.JTTrue;
 
 public class JsonTokenizer implements Iterator<JsonToken> {
     private JsonCharacterIterator iterator;
@@ -74,7 +65,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
     }
 
     private void readNext() {
-        skipWhitespace();
+        skipMeaninglessChars();
 
         if (!iterator.hasNext()) {
             next = null;
@@ -82,7 +73,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         }
 
         next = switch (iterator.peek()) {
-            case JCCh(char ch, _) -> switch (ch) {
+            case JCCh(char ch, var pos) -> switch (ch) {
                 case '{' -> read(JsonToken.OBJECT_OPEN);
                 case '}' -> read(JsonToken.OBJECT_CLOSE);
                 case '[' -> read(JsonToken.ARRAY_OPEN);
@@ -299,9 +290,45 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         return token;
     }
 
-    private void skipWhitespace() {
+    /**
+     * Skip whitespace, skip line comment (started with // until line end), block comment (started with /*, ended with *\/) if allowed
+     */
+    private void skipMeaninglessChars() {
         while (iterator.peek() instanceof JCWhitespace _) {
             iterator.next();
+        }
+
+        if (config.commentAllowed() && iterator.peek() instanceof JCCh(char ch, _) && ch == '/') {
+            iterator.next();
+
+            switch (iterator.peek()) {
+                case JCCh(char ch1, _) when ch1 == '/' -> {
+                    iterator.next();
+                    while (iterator.hasNext()) {
+                        if (iterator.next() instanceof JCWhitespace(char ch2, _) && ch2 == '\n') {
+                            break;
+                        }
+                    }
+                    skipMeaninglessChars();
+                }
+                case JCCh(char ch1, _) when ch1 == '*' -> {
+                    iterator.next();
+                    skipUntilBlockCommentEnd();
+                    skipMeaninglessChars();
+                }
+                default -> {}
+            }
+        }
+    }
+
+    private void skipUntilBlockCommentEnd() {
+        while (iterator.hasNext()) {
+            if (iterator.next() instanceof JCCh(char ch, _) && ch == '*') {
+                if (iterator.peek() instanceof JCCh(char ch1, _) && ch1 == '/') {
+                    iterator.next();
+                    break;
+                }
+            }
         }
     }
 }

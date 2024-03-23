@@ -48,4 +48,13 @@ public interface JsonStringTemplateConfigureable<THIS> {
         return withExtraCommaAllowed(false);
     }
     THIS withExtraCommaAllowed(boolean extraCommaAllowed);
+
+    boolean commentAllowed();
+    default THIS allowComment() {
+        return withCommentAllowed(true);
+    }
+    default THIS disallowComment() {
+        return withCommentAllowed(false);
+    }
+    THIS withCommentAllowed(boolean commentAllowed);
 }
