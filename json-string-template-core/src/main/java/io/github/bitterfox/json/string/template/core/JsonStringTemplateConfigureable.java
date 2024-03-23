@@ -23,38 +23,38 @@ package io.github.bitterfox.json.string.template.core;
 
 public interface JsonStringTemplateConfigureable<THIS> {
     boolean cacheEnabled();
+    THIS withCacheEnabled(boolean cacheEnabled);
     default THIS enableCache() {
         return withCacheEnabled(true);
     }
     default THIS disableCache() {
         return withCacheEnabled(false);
     }
-    THIS withCacheEnabled(boolean cacheEnabled);
 
     boolean tailingCommaAllowed();
+    THIS withTailingCommaAllowed(boolean tailingCommaAllowed);
     default THIS allowTailingComma() {
         return withTailingCommaAllowed(true);
     }
     default THIS disallowTailingComma() {
         return withTailingCommaAllowed(false);
     }
-    THIS withTailingCommaAllowed(boolean tailingCommaAllowed);
 
     boolean extraCommaAllowed();
+    THIS withExtraCommaAllowed(boolean extraCommaAllowed);
     default THIS allowExtraComma() {
         return withExtraCommaAllowed(true);
     }
     default THIS disallowExtraComma() {
         return withExtraCommaAllowed(false);
     }
-    THIS withExtraCommaAllowed(boolean extraCommaAllowed);
 
     boolean commentAllowed();
+    THIS withCommentAllowed(boolean commentAllowed);
     default THIS allowComment() {
         return withCommentAllowed(true);
     }
     default THIS disallowComment() {
         return withCommentAllowed(false);
     }
-    THIS withCommentAllowed(boolean commentAllowed);
 }
