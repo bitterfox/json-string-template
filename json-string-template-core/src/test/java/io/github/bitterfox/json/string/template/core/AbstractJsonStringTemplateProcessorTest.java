@@ -30,11 +30,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-abstract class AbstractJsonStringTemplateProcessorTest {
+public abstract class AbstractJsonStringTemplateProcessorTest {
     protected JsonStringTemplateProcessor<Object> JSON;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    static class JavaObjectJsonBridge implements JsonBridge<Object> {
+    public static class JavaObjectJsonBridge implements JsonBridge<Object> {
         @Override
         public Object createObject(Map<String, Object> object) {
             return object;

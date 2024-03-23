@@ -28,6 +28,7 @@ import java.util.List;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCWhitespace;
+import io.github.bitterfox.json.string.template.core.JsonStringTemplateException.Phase;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTJavaObject;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTNumber;
 import io.github.bitterfox.json.string.template.core.JsonToken.JTString;
@@ -92,7 +93,7 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                     if (Character.isDigit(ch)) {
                         yield readNumber();
                     } else {
-                        throw new IllegalStateException(STR."unexpected token json char \{ch}");
+                        throw new JsonStringTemplateException(STR."Unexpected char \{ch}", Phase.LEXER_TOKENIZER, iterator.getTemplate(), pos);
                     }
                 }
             };

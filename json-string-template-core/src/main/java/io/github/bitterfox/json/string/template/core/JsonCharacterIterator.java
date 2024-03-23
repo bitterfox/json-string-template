@@ -22,7 +22,6 @@
 package io.github.bitterfox.json.string.template.core;
 
 import java.util.Iterator;
-import java.util.List;
 
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCCh;
 import io.github.bitterfox.json.string.template.core.JsonCharacter.JCObj;
@@ -32,6 +31,8 @@ import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPositi
 import io.github.bitterfox.json.string.template.core.JsonPosition.ValuePosition;
 
 public class JsonCharacterIterator implements Iterator<JsonCharacter> {
+    private final StringTemplate template;
+
     private final Iterator<String> fragments;
     private final Iterator<Object> values;
 
@@ -43,18 +44,16 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
 
     private int index = 0;
 
-    public JsonCharacterIterator(List<String> fragments, List<Object> values) {
-        require(!fragments.isEmpty());
-        require(fragments.size() == values.size() + 1);
+    public JsonCharacterIterator(StringTemplate template, JsonStringTemplateConfiguration config) {
+        this.template = template;
 
-        this.fragments = fragments.iterator();
-        this.values = values.iterator();
+        require(!template.fragments().isEmpty());
+        require(template.fragments().size() == template.values().size() + 1);
+
+        fragments = template.fragments().iterator();
+        values = template.values().iterator();
 
         readNext();
-    }
-
-    public JsonCharacterIterator(StringTemplate template, JsonStringTemplateConfiguration config) {
-        this(template.fragments(), template.values());
     }
 
     private void require(boolean b) {
@@ -124,5 +123,9 @@ public class JsonCharacterIterator implements Iterator<JsonCharacter> {
             case ' ', '\t', '\n', '\r' -> true;
             default -> false;
         };
+    }
+
+    public StringTemplate getTemplate() {
+        return template;
     }
 }
