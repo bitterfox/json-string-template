@@ -46,6 +46,16 @@ public abstract class AbstractJsonStringTemplateProcessor<JSON> implements JsonS
     }
 
     @Override
+    public boolean tailingCommaAllowed() {
+        return config.tailingCommaAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<JSON> withTailingCommaAllowed(boolean tailingCommaAllowed) {
+        return withConfiguration(config.withTailingCommaAllowed(tailingCommaAllowed));
+    }
+
+    @Override
     public boolean extraCommaAllowed() {
         return config.extraCommaAllowed();
     }

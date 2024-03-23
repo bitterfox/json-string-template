@@ -31,6 +31,15 @@ public interface JsonStringTemplateConfigureable<THIS> {
     }
     THIS withCacheEnabled(boolean cacheEnabled);
 
+    boolean tailingCommaAllowed();
+    default THIS allowTailingComma() {
+        return withTailingCommaAllowed(true);
+    }
+    default THIS disallowTailingComma() {
+        return withTailingCommaAllowed(false);
+    }
+    THIS withTailingCommaAllowed(boolean tailingCommaAllowed);
+
     boolean extraCommaAllowed();
     default THIS allowExtraComma() {
         return withExtraCommaAllowed(true);

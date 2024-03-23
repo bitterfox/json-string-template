@@ -60,17 +60,21 @@ public record JsonParserV1<JSON>(
 
     private JSON parseObject() {
         accept(JsonToken.OBJECT_OPEN);
+        if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+            accept(JsonToken.OBJECT_CLOSE);
+            return jsonBridge.createObject(Map.of());
+        }
+
+        // If comma found when tailing comma allowed at the first element expected
+        // Array must be closed immediately
+        if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTComma) {
+            acceptComma();
+            accept(JsonToken.OBJECT_CLOSE);
+            return jsonBridge.createObject(Map.of());
+        }
 
         Map<String, JSON> object = new HashMap<>();
         while (true) {
-            if (extendJsonSpecAllowsExtraComma()) {
-                break;
-            }
-
-            if (object.isEmpty() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
-                break;
-            }
-
             String key = parseString();
             accept(JsonToken.COLON);
             JSON value = parseValue();
@@ -82,8 +86,11 @@ public record JsonParserV1<JSON>(
 
             if (tokenizer.peek() instanceof JTObjectClose) {
                 break;
-            } else {
-                accept(JsonToken.COMMA);
+            }
+
+            acceptComma();
+            if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                break;
             }
         }
 
@@ -91,30 +98,42 @@ public record JsonParserV1<JSON>(
         return jsonBridge.createObject(object);
     }
 
-    private boolean extendJsonSpecAllowsExtraComma() {
+    private void acceptComma() {
+        accept(JsonToken.COMMA);
         if (config.extraCommaAllowed()) {
             while (tokenizer.peek() instanceof JsonToken.JTComma) {
                 tokenizer.next();
             }
-            if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
-                return true;
-            }
         }
-        return false;
     }
 
     private JSON parseArray() {
         accept(JsonToken.ARRAY_OPEN);
+        if (tokenizer.peek() instanceof JsonToken.JTArrayClose) {
+            accept(JsonToken.ARRAY_CLOSE);
+            return jsonBridge.createArray(List.of());
+        }
+
+        // If comma found when tailing comma allowed at the first element expected
+        // Array must be closed immediately
+        if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTComma) {
+            acceptComma();
+            accept(JsonToken.ARRAY_CLOSE);
+            return jsonBridge.createArray(List.of());
+        }
 
         List<JSON> array = new ArrayList<>();
-        while (!(tokenizer.peek() instanceof JTArrayClose)) {
+        while (true) {
             JSON value = parseValue();
             array.add(value);
 
             if (tokenizer.peek() instanceof JTArrayClose) {
-                // do nothing
-            } else {
-                accept(JsonToken.COMMA);
+                break;
+            }
+
+            acceptComma();
+            if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTArrayClose) {
+                break;
             }
         }
 

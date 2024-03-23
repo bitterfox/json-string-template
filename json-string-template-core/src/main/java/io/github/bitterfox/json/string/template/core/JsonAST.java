@@ -22,7 +22,6 @@
 package io.github.bitterfox.json.string.template.core;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTArray;
@@ -46,6 +45,8 @@ public sealed interface JsonAST
                 JASTTrue,
                 JASTFalse,
                 JASTNull {
+    JASTObject EMPTY_OBJECT = new JASTObject(List.of());
+    JASTArray EMPTY_ARRAY = new JASTArray(List.of());
     JASTTrue TRUE = new JASTTrue();
     JASTFalse FALSE = new JASTFalse();
     JASTNull NULL = new JASTNull();

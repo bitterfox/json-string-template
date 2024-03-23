@@ -162,30 +162,50 @@ abstract class AbstractJsonStringTemplateProcessorTest {
     }
 
     @Test
-    void testExtraCommaAllowed() {
+    void testTailingCommaAndExtraCommaAllowed() {
         Object json;
+
+        // Object
         json = JSON."""
                 {
                     ,,,
                 }
                 """;
+        assertEquals(Map.of(), json);
         json = JSON."""
                 {
-                    ,,,
                     "test": "hoge",,,
                     "test2": "foo",,,
                 }
                 """;
+        assertEquals(Map.of("test", "hoge", "test2", "foo"), json);
+
+        // Array
+        json = JSON."""
+                [
+                    ,,,
+                ]
+                """;
+        assertEquals(List.of(), json);
+        json = JSON."""
+                [
+                    "hoge",,,
+                    "foo",,,
+                ]
+                """;
+        assertEquals(List.of("hoge", "foo"), json);
     }
 
     @Test
     void testExtraCommaNotAllowed() {
         var JSON = this.JSON.disallowExtraComma();
         Object json;
+
+        // Object
         try {
             json = JSON."""
                     {
-                        ,
+                        ,,,
                     }
                     """;
             fail();
@@ -211,6 +231,96 @@ abstract class AbstractJsonStringTemplateProcessorTest {
                     "test": "hoge",
                     "test2": "foo",,
                 }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+
+        // Array
+        try {
+            json = JSON."""
+                    {
+                        ,,,
+                    }
+                    """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                {
+                    "test": "hoge",,
+                    "test2": "foo"
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                {
+                    "test": "hoge",
+                    "test2": "foo",,
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+    }
+
+    @Test
+    void testTailingCommaNotAllowed() {
+        var JSON = this.JSON.disallowTailingComma();
+        Object json;
+
+        // Object
+        try {
+            json = JSON."""
+                    {
+                        ,
+                    }
+                    """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                {
+                    "test": "hoge",
+                    "test2": "foo",
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+
+        // Array
+        try {
+            json = JSON."""
+                    [
+                        ,
+                    ]
+                    """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+        try {
+
+            json = JSON."""
+                [
+                    "hoge",
+                    "foo",
+                ]
                 """;
             fail();
         } catch (Exception e) {

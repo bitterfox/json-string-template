@@ -59,17 +59,21 @@ public record JsonParserV2(JsonTokenizer tokenizer, JsonStringTemplateConfigurat
 
     private JsonAST parseObject() {
         accept(JsonToken.OBJECT_OPEN);
+        if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+            accept(JsonToken.OBJECT_CLOSE);
+            return JsonAST.EMPTY_OBJECT;
+        }
+
+        // If comma found when tailing comma allowed at the first element expected
+        // Array must be closed immediately
+        if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTComma) {
+            acceptComma();
+            accept(JsonToken.OBJECT_CLOSE);
+            return JsonAST.EMPTY_OBJECT;
+        }
 
         List<Entry<JsonAST, JsonAST>> fields = new ArrayList<>();
         while (true) {
-            if (extendJsonSpecAllowsExtraComma()) {
-                break;
-            }
-
-            if (fields.isEmpty() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
-                break;
-            }
-
             JsonAST key = parseString();
             accept(JsonToken.COLON);
             JsonAST value = parseValue();
@@ -77,41 +81,54 @@ public record JsonParserV2(JsonTokenizer tokenizer, JsonStringTemplateConfigurat
 
             if (tokenizer.peek() instanceof JTObjectClose) {
                 break;
-            } else {
-                accept(JsonToken.COMMA);
+            }
+
+            acceptComma();
+            if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTObjectClose) {
+                break;
             }
         }
-
         accept(JsonToken.OBJECT_CLOSE);
         return new JASTObject(fields);
     }
 
-    private boolean extendJsonSpecAllowsExtraComma() {
+    private void acceptComma() {
+        accept(JsonToken.COMMA);
         if (config.extraCommaAllowed()) {
             while (tokenizer.peek() instanceof JsonToken.JTComma) {
                 tokenizer.next();
             }
-            if (tokenizer.peek() instanceof JsonToken.JTObjectClose) {
-                return true;
-            }
         }
-        return false;
     }
 
     private JsonAST parseArray() {
         accept(JsonToken.ARRAY_OPEN);
+        if (tokenizer.peek() instanceof JsonToken.JTArrayClose) {
+            accept(JsonToken.ARRAY_CLOSE);
+            return JsonAST.EMPTY_ARRAY;
+        }
+
+        // If comma found when tailing comma allowed at the first element expected
+        // Array must be closed immediately
+        if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTComma) {
+            acceptComma();
+            accept(JsonToken.ARRAY_CLOSE);
+            return JsonAST.EMPTY_ARRAY;
+        }
 
         List<JsonAST> values = new ArrayList<>();
-        while (!(tokenizer.peek() instanceof JTArrayClose)) {
+        while (true) {
             values.add(parseValue());
 
             if (tokenizer.peek() instanceof JTArrayClose) {
-                // do nothing
-            } else {
-                accept(JsonToken.COMMA);
+                break;
+            }
+
+            acceptComma();
+            if (config.tailingCommaAllowed() && tokenizer.peek() instanceof JsonToken.JTArrayClose) {
+                break;
             }
         }
-
         accept(JsonToken.ARRAY_CLOSE);
         return new JASTArray(values);
     }

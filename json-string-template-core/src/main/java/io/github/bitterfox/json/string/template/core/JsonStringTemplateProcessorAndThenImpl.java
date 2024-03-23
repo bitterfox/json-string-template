@@ -48,6 +48,16 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
     }
 
     @Override
+    public boolean tailingCommaAllowed() {
+        return processor.tailingCommaAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<U> withTailingCommaAllowed(boolean tailingCommaAllowed) {
+        return new JsonStringTemplateProcessorAndThenImpl<>(processor.withTailingCommaAllowed(tailingCommaAllowed), function);
+    }
+
+    @Override
     public boolean extraCommaAllowed() {
         return processor.extraCommaAllowed();
     }
