@@ -38,11 +38,11 @@ Additionally, the core library, including the parser, does not depend on other J
 Currently, the following JSON libraries are integrated with this JSON String Template extension:
 
 - [Jakarta JSON Processing™ API](https://projects.eclipse.org/projects/ee4j.jsonp)
-  - [io.github.bitterfox:json-string-template-jakarta-json:0.21.4](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jakarta-json)
+  - [io.github.bitterfox:json-string-template-jakarta-json:0.21.5](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jakarta-json)
 - [JSON in Java a.k.a. org.json](https://github.com/stleary/JSON-java)
-  - [io.github.bitterfox:json-string-template-org-json:0.21.4](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-org-json)
+  - [io.github.bitterfox:json-string-template-org-json:0.21.5](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-org-json)
 - [Jackson](https://github.com/FasterXML/jackson)
-  - [io.github.bitterfox:json-string-template-jackson:0.21.4](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jackson)
+  - [io.github.bitterfox:json-string-template-jackson:0.21.5](https://central.sonatype.com/artifact/io.github.bitterfox/json-string-template-jackson)
 
 ## Disclaimer
 Until String Template is released and this library becomes version 1.x.x, any part of feature in this library
@@ -58,9 +58,9 @@ First, add one of the bridge libraries mentioned above to your project.
 // build.gradle.kts
 
 dependencies {
-  implementation("io.github.bitterfox:json-string-template-jakarta-json:0.21.4")
-  implementation("io.github.bitterfox:json-string-template-org-json:0.21.4")
-  implementation("io.github.bitterfox:json-string-template-jackson:0.21.4")
+  implementation("io.github.bitterfox:json-string-template-jakarta-json:0.21.5")
+  implementation("io.github.bitterfox:json-string-template-org-json:0.21.5")
+  implementation("io.github.bitterfox:json-string-template-jackson:0.21.5")
 }
 ```
 
