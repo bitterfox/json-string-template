@@ -80,11 +80,15 @@ public class JsonTokenizer implements Iterator<JsonToken> {
                 case ']' -> read(JsonToken.ARRAY_CLOSE);
                 case ',' -> read(JsonToken.COMMA);
                 case ':' -> read(JsonToken.COLON);
-                case '"' -> readString();
+                case '"' -> readString('"');
                 // can be true, false or null
                 case 't', 'f', 'n' -> readLiteral();
                 case '-' -> readNumber();
                 default -> {
+                    if (config.singleQuoteForStringSeparatorAllowed() && ch == '\'') {
+                        yield readString('\'');
+                    }
+
                     if (Character.isDigit(ch)) {
                         yield readNumber();
                     } else {
@@ -97,20 +101,20 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         };
     }
 
-    private JTString readString() {
+    private JTString readString(char stringSeparator) {
         List<String> fragments = new ArrayList<>();
         List<Object> values = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
-        var startPos = accept('"').pos();
+        var startPos = accept(stringSeparator).pos();
         while (iterator.hasNext()) {
             JsonCharacter jch = iterator.next();
             switch (jch) {
                 case JCCh(char ch, _) -> {
                     if (ch == '\\') {
                         // TODO Use substring
-                        sb.append(readEscape());
-                    } else if (ch == '"') {
+                        sb.append(readEscape(stringSeparator));
+                    } else if (ch == stringSeparator) {
                         fragments.add(sb.toString());
                         return new JTString(fragments, values, new JsonPositionRange(startPos, jch.pos()));
                     } else {
@@ -129,11 +133,12 @@ public class JsonTokenizer implements Iterator<JsonToken> {
         throw new IllegalStateException(STR."String is not closed \{sb}");
     }
 
-    private char readEscape() {
+    private char readEscape(char stringSeparator) {
         return switch (iterator.next()) {
+            case JCCh(char ch, _) when ch == stringSeparator -> ch;
             case JCCh(char ch, _) ->
                 switch (ch) {
-                    case '"', '\\', '/' -> ch;
+                    case '\\', '/' -> ch;
                     case 'b' -> '\b'; // BS (backspace) 8
                     case 'f' -> '\f'; // FF (NP form feed) 12
                     case 'n' -> '\n'; // LF (NL line feed) 10

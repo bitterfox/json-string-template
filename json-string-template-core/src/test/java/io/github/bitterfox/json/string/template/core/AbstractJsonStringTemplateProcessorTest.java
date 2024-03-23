@@ -392,4 +392,61 @@ abstract class AbstractJsonStringTemplateProcessorTest {
             // ok
         }
     }
+
+    @Test
+    void testSingleQuoteForStringAllowed() {
+        String name = "name";
+
+        Object json = JSON."{'name': \{name}}";
+
+        assertEquals(
+                Map.of("name", name),
+                json);
+
+        json = JSON."""
+            {
+                'name': 'double quote " without escape ok'
+            }
+            """;
+
+        assertEquals(
+                Map.of("name", "double quote \" without escape ok"),
+                json);
+
+        json = JSON."""
+            {
+                'name': 'single quote \\' requires escape'
+            }
+            """;
+
+        assertEquals(
+                Map.of("name", "single quote ' requires escape"),
+                json);
+
+        try {
+            json = JSON."""
+                {
+                    'test': 'te'st'
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+    }
+
+    @Test
+    void testSingleQuoteForStringDisallowed() {
+        var JSON = this.JSON.disallowSingleQuoteForStringSeparator();
+        try {
+            Object json = JSON."""
+                {
+                    'name': 'test'
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+    }
 }

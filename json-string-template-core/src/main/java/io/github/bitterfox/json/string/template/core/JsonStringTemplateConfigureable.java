@@ -57,4 +57,13 @@ public interface JsonStringTemplateConfigureable<THIS> {
     default THIS disallowComment() {
         return withCommentAllowed(false);
     }
+
+    boolean singleQuoteForStringSeparatorAllowed();
+    THIS withSingleQuoteForStringSeparatorAllowed(boolean singleQuoteForStringSeparatorAllowed);
+    default THIS allowSingleQuoteForStringSeparator() {
+        return withSingleQuoteForStringSeparatorAllowed(true);
+    }
+    default THIS disallowSingleQuoteForStringSeparator() {
+        return withSingleQuoteForStringSeparatorAllowed(false);
+    }
 }

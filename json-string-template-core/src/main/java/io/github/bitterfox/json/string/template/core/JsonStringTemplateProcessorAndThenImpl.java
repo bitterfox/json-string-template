@@ -80,4 +80,15 @@ public record JsonStringTemplateProcessorAndThenImpl<JSON, U>(
     public JsonStringTemplateProcessor<U> withCommentAllowed(boolean commentAllowed) {
         return withProcessor(processor.withCommentAllowed(commentAllowed));
     }
+
+    @Override
+    public boolean singleQuoteForStringSeparatorAllowed() {
+        return processor.singleQuoteForStringSeparatorAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<U> withSingleQuoteForStringSeparatorAllowed(
+            boolean singleQuoteForStringSeparatorAllowed) {
+        return withProcessor(processor.withSingleQuoteForStringSeparatorAllowed(singleQuoteForStringSeparatorAllowed));
+    }
 }

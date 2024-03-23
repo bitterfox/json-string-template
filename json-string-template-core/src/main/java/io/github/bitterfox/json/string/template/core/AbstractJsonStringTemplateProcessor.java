@@ -74,4 +74,15 @@ public abstract class AbstractJsonStringTemplateProcessor<JSON> implements JsonS
     public JsonStringTemplateProcessor<JSON> withCommentAllowed(boolean commentAllowed) {
         return withConfiguration(config.withCommentAllowed(commentAllowed));
     }
+
+    @Override
+    public boolean singleQuoteForStringSeparatorAllowed() {
+        return config.singleQuoteForStringSeparatorAllowed();
+    }
+
+    @Override
+    public JsonStringTemplateProcessor<JSON> withSingleQuoteForStringSeparatorAllowed(
+            boolean singleQuoteForStringSeparatorAllowed) {
+        return withConfiguration(config.withSingleQuoteForStringSeparatorAllowed(singleQuoteForStringSeparatorAllowed));
+    }
 }

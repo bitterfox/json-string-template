@@ -25,9 +25,11 @@ public record JsonStringTemplateConfiguration(
         boolean cacheEnabled,
         boolean tailingCommaAllowed,
         boolean extraCommaAllowed,
-        boolean commentAllowed
+        boolean commentAllowed,
+        boolean singleQuoteForStringSeparatorAllowed
 ) implements JsonStringTemplateConfigureable<JsonStringTemplateConfiguration> {
     public static final JsonStringTemplateConfiguration DEFAULT = new JsonStringTemplateConfiguration(
+            true,
             true,
             true,
             true,
@@ -36,7 +38,8 @@ public record JsonStringTemplateConfiguration(
     public static final JsonStringTemplateConfiguration JSON_SPEC =
             DEFAULT.disallowTailingComma()
                    .disallowExtraComma()
-                   .disallowComment();
+                   .disallowComment()
+                   .disallowSingleQuoteForStringSeparator();
 
     public static JsonStringTemplateConfiguration ofDefault() {
         return DEFAULT;
@@ -52,7 +55,8 @@ public record JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
                 extraCommaAllowed,
-                commentAllowed
+                commentAllowed,
+                singleQuoteForStringSeparatorAllowed
         );
     }
 
@@ -62,7 +66,8 @@ public record JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
                 extraCommaAllowed,
-                commentAllowed
+                commentAllowed,
+                singleQuoteForStringSeparatorAllowed
         );
     }
 
@@ -72,7 +77,8 @@ public record JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
                 extraCommaAllowed,
-                commentAllowed
+                commentAllowed,
+                singleQuoteForStringSeparatorAllowed
         );
     }
 
@@ -82,7 +88,20 @@ public record JsonStringTemplateConfiguration(
                 cacheEnabled,
                 tailingCommaAllowed,
                 extraCommaAllowed,
-                commentAllowed
+                commentAllowed,
+                singleQuoteForStringSeparatorAllowed
+        );
+    }
+
+    @Override
+    public JsonStringTemplateConfiguration withSingleQuoteForStringSeparatorAllowed(
+            boolean singleQuoteForStringSeparatorAllowed) {
+        return new JsonStringTemplateConfiguration(
+                cacheEnabled,
+                tailingCommaAllowed,
+                extraCommaAllowed,
+                commentAllowed,
+                singleQuoteForStringSeparatorAllowed
         );
     }
 }
