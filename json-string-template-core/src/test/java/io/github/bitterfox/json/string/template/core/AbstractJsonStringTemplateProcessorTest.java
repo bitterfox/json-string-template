@@ -315,7 +315,6 @@ abstract class AbstractJsonStringTemplateProcessorTest {
             // ok
         }
         try {
-
             json = JSON."""
                 [
                     "hoge",
@@ -361,5 +360,36 @@ abstract class AbstractJsonStringTemplateProcessorTest {
                        "array", List.of(1, 2, 3)
                 ),
                 json);
+    }
+
+    @Test
+    void testCommentDisallowed() {
+        var JSON = this.JSON.disallowComment();
+        try {
+            Object json = JSON."""
+                {
+                    /**
+                     * This field is name
+                     * *\\/ <- Note that this is not end of block comment (/ is escaped)
+                     */ // combination with single line comment
+                    "name": "text"
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
+
+        try {
+            Object json = JSON."""
+                {
+                    // line comment
+                    "name": "text"
+                }
+                """;
+            fail();
+        } catch (Exception e) {
+            // ok
+        }
     }
 }
