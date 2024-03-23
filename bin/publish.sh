@@ -6,7 +6,7 @@ set -eo pipefail
 
 sed -i -r "s/(.*version.*)-SNAPSHOT(.*)/\1\2/" ./build.gradle.kts
 git add ./build.gradle.kts
-git commit -m "main Bump `grep 'version = ' build.gradle.kts | sed -r 's/.*version = "(.*)"/\1/'`"
+git commit -m "[RELEASE] Bump `grep 'version = ' build.gradle.kts | sed -r 's/.*version = "(.*)"/\1/'`"
 
 ./gradlew :json-string-template-core:publishToCentralPortal
 ./gradlew :json-string-template-jakarta-json:publishToCentralPortal

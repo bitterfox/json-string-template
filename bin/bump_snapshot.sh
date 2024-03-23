@@ -16,4 +16,4 @@ sed -i -r "s/(.*io\.github\.bitterfox:json-string-template.*)${majorminor}\.${ol
 
 git add ./build.gradle.kts ./README.md
 
-git commit -m "Bump ${majorminor}.${new_update}-SNAPSHOT"
+git commit -m "[SNAPSHOT] Bump ${majorminor}.${new_update}-SNAPSHOT"
