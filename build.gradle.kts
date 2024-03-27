@@ -23,8 +23,8 @@ allprojects {
     }
 
     configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.toVersion("21")
-        targetCompatibility = JavaVersion.toVersion("21")
+        sourceCompatibility = JavaVersion.toVersion("22")
+        targetCompatibility = JavaVersion.toVersion("22")
     }
 
     tasks.test {
