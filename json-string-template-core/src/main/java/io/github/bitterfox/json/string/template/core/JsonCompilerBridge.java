@@ -93,18 +93,23 @@ public interface JsonCompilerBridge<T> {
     default void compileNumber(JsonCompilerV2Context context, CodeBuilder code, String number) {
 
     }
+    default void compileNumber(JsonCompilerV2Context context, CodeBuilder code, Number number) {
+
+    }
     boolean isNumberImmutable();
 
-    default void compileTrue() {
+    default void compileTrue(JsonCompilerV2Context context, CodeBuilder code) {
 
     }
     boolean isTrueImmutable();
-    default void compileFalse() {
+    default void compileFalse(JsonCompilerV2Context context, CodeBuilder code) {
 
     }
     boolean isFalseImmutable();
-    default void compileNull() {
+    default void compileNull(JsonCompilerV2Context context, CodeBuilder code) {
 
     }
     boolean isNullImmutable();
+
+    void compileJavaObject(JsonCompilerV2Context context, CodeBuilder processCode, int argPos);
 }
