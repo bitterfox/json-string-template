@@ -56,6 +56,17 @@ public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, Runti
     }
 
     /**
+     * {@link #ofV3(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
+     * @param jsonBridge
+     * @return
+     * @param <JSON>
+     */
+    @Deprecated(forRemoval = true)
+    static <JSON> JsonStringTemplateProcessor<JSON> ofV3(JsonCompilerBridge<JSON> jsonBridge) {
+        return new JsonStringTemplateProcessorV3Impl<>(jsonBridge, JsonStringTemplateConfiguration.ofDefault());
+    }
+
+    /**
      * {@link #ofV2(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
      * @param jsonBridge
      * @return
@@ -97,6 +108,17 @@ public interface JsonStringTemplateProcessor<JSON> extends Processor<JSON, Runti
     @Deprecated(forRemoval = true)
     static <JSON> JsonStringTemplateProcessor<JSON> ofV2Cached(JsonBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
         return new JsonStringTemplateProcessorV2CachedImpl<>(jsonBridge, config);
+    }
+
+    /**
+     * {@link #ofV3(JsonBridge)} is used only for backward compatibility and internal purpose like benchmarking. Use {@link #of(JsonBridge)}.
+     * @param jsonBridge
+     * @return
+     * @param <JSON>
+     */
+    @Deprecated(forRemoval = true)
+    static <JSON> JsonStringTemplateProcessor<JSON> ofV3(JsonCompilerBridge<JSON> jsonBridge, JsonStringTemplateConfiguration config) {
+        return new JsonStringTemplateProcessorV3Impl<>(jsonBridge, config);
     }
 
     JSON process(StringTemplate stringTemplate);

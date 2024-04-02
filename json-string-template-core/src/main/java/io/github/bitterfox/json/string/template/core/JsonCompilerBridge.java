@@ -20,7 +20,6 @@ public interface JsonCompilerBridge<T> {
         return CD_List;
     }
 
-
     // before: ...
     // after: ..., JsonObjectIntermediate
     /**
@@ -61,7 +60,7 @@ public interface JsonCompilerBridge<T> {
 
     // before: ..., String
     // after: ..., JsonString
-    default void compileString(JsonCompilerV2Context context, CodeBuilder code) {
+    void compileString(JsonCompilerV2Context context, CodeBuilder code);
 //        if (fragments.size() == 1) {
 //            // Constant
 //            code.ldc(context.classBuilder.constantPool().stringEntry(fragments.get(0)));
@@ -86,29 +85,19 @@ public interface JsonCompilerBridge<T> {
 //
 //            code.invokevirtual(CD_Object, "toString", MethodTypeDesc.of(CD_String));
 //        }
-    }
+
     boolean isStringImmutable();
     boolean cacheString();
 
-    default void compileNumber(JsonCompilerV2Context context, CodeBuilder code, String number) {
-
-    }
-    default void compileNumber(JsonCompilerV2Context context, CodeBuilder code, Number number) {
-
-    }
+    void compileNumber(JsonCompilerV2Context context, CodeBuilder code, String number);
+    void compileNumber(JsonCompilerV2Context context, CodeBuilder code, Number number);
     boolean isNumberImmutable();
 
-    default void compileTrue(JsonCompilerV2Context context, CodeBuilder code) {
-
-    }
+    void compileTrue(JsonCompilerV2Context context, CodeBuilder code);
     boolean isTrueImmutable();
-    default void compileFalse(JsonCompilerV2Context context, CodeBuilder code) {
-
-    }
+    void compileFalse(JsonCompilerV2Context context, CodeBuilder code);
     boolean isFalseImmutable();
-    default void compileNull(JsonCompilerV2Context context, CodeBuilder code) {
-
-    }
+    void compileNull(JsonCompilerV2Context context, CodeBuilder code);
     boolean isNullImmutable();
 
     void compileJavaObject(JsonCompilerV2Context context, CodeBuilder processCode, int argPos);

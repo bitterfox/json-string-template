@@ -1,18 +1,14 @@
 package io.github.bitterfox.json.string.template.core;
 
 import static java.lang.StringTemplate.RAW;
-import static java.lang.constant.ConstantDescs.CD_Boolean;
 import static java.lang.constant.ConstantDescs.CD_CallSite;
-import static java.lang.constant.ConstantDescs.CD_List;
-import static java.lang.constant.ConstantDescs.CD_Map;
 import static java.lang.constant.ConstantDescs.CD_MethodHandles_Lookup;
 import static java.lang.constant.ConstantDescs.CD_MethodType;
 import static java.lang.constant.ConstantDescs.CD_Object;
 import static java.lang.constant.ConstantDescs.CD_String;
-import static java.lang.constant.ConstantDescs.CD_int;
-import static java.lang.constant.ConstantDescs.CD_void;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.classfile.ClassFile;
 import java.lang.classfile.CodeBuilder;
 import java.lang.constant.ClassDesc;
@@ -23,7 +19,10 @@ import java.lang.constant.DirectMethodHandleDesc.Kind;
 import java.lang.constant.DynamicCallSiteDesc;
 import java.lang.constant.MethodHandleDesc;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +41,7 @@ import io.github.bitterfox.json.string.template.core.JsonAST.JASTNumberString;
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTObject;
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTString;
 import io.github.bitterfox.json.string.template.core.JsonAST.JASTTrue;
+import io.github.bitterfox.json.string.template.core.JsonAST.JsonVisitor;
 import io.github.bitterfox.json.string.template.core.JsonPosition.FragmentPosition;
 
 public class JsonCompilerV2<T> {
@@ -53,16 +53,18 @@ public class JsonCompilerV2<T> {
         this.bridge = bridge;
     }
 
-    void compile(int args, JsonAST json) throws IOException {
-        ClassDesc clazz = ClassDesc.of("JSON" + CLASS_ID.getAndIncrement());
+    MethodHandle compile(int args, JsonAST json) {
+        String className = "JSON" + CLASS_ID.getAndIncrement();
+        ClassDesc classDesc = ClassDesc.of(className);
 
         MethodTypeDesc processMethodSignature = MethodTypeDesc.of(
                 bridge.jsonClass(),
                 Stream.generate(() -> ConstantDescs.CD_Object).limit(args).collect(Collectors.toList())
         );
 
-        ClassFile.of()
-                .buildTo(Path.of(STR."/tmp/\{clazz.displayName()}.class"), clazz, classBuilder -> {
+        byte[] classBytes = ClassFile.of()
+//                 .buildTo(Path.of(STR."/tmp/\{clazz.displayName()}.class"), clazz, classBuilder -> {
+                .build(classDesc, classBuilder -> {
                     classBuilder.withMethod(
                             ConstantDescs.CLASS_INIT_NAME, MethodTypeDesc.of(ConstantDescs.CD_void), Modifier.PUBLIC | Modifier.STATIC,
                             classInitMethod -> {
@@ -75,7 +77,7 @@ public class JsonCompilerV2<T> {
                                                         processMethod.withCode(
                                                                 processCode -> {
                                                                     JsonCompilerV2Context context =
-                                                                            new JsonCompilerV2Context(clazz, classBuilder, classInitCode, processCode);
+                                                                            new JsonCompilerV2Context(classDesc, classBuilder, classInitCode, processCode);
 
                                                                     json.visit(new Visitor(context));
                                                                     classInitCode.return_();
@@ -85,200 +87,199 @@ public class JsonCompilerV2<T> {
                                         });
                             });
                 });
+
+        try {
+            Files.write(Path.of(STR."/tmp/\{className}.class"), classBytes);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        try {
+            Class<?> clazz = new ClassLoader() {
+                @Override
+                protected Class<?> findClass(String name) {
+                    return defineClass(name, classBytes, 0, classBytes.length);
+                }
+            }.loadClass(className);
+
+            return MethodHandles.lookup().findStatic(clazz, "process",
+                                                     processMethodSignature.resolveConstantDesc(MethodHandles.lookup()));
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    class Visitor implements JsonAST.JsonVisitor<Void> {
-        private JsonCompilerV2Context context;
-        private CodeBuilder code;
-        private boolean caching = false;
+    class Visitor extends CompileVisitor {
+        private final CompileVisitor compileToStaticInitializer;
 
         public Visitor(JsonCompilerV2Context context) {
-            this.context = context;
-            this.code = context.processCode;
+            super(context, context.processCode);
+            compileToStaticInitializer = new CompileVisitor(context, context.classInitCode);
+        }
+
+        public String cache(ClassDesc classDesc) {
+            String field = context.newField(classDesc);
+            context.classInitCode.putstatic(context.clazz, field, classDesc);
+            return field;
+        }
+        public String cacheAndGet(ClassDesc classDesc) {
+            String field = cache(classDesc);
+            context.processCode.getstatic(context.clazz, field, classDesc);
+            return field;
         }
 
         @Override
         public Void visitObject(JASTObject that) {
-            if (!caching && that.visit(new CheckCacheable())) {
-                caching = true;
-                try {
-                    // Cache whole object
-                    bridge.compileCreateJsonObjectIntermediate(context, context.classInitCode,
-                                                               that.fields().size(), null);
-                    that.fields().forEach(e -> {
-                        context.classInitCode.dup();
-                        compileJsonObjectKey(e.getKey(), context.classInitCode);
-                        code = context.classInitCode;
-                        try {
-                            e.getValue().visit(this);
-                        } finally {
-                            code = context.processCode;
-                        }
-                        bridge.compilePutToJsonObjectIntermediate(context, context.classInitCode);
-                    });
-                    bridge.compileFinishJsonObjectIntermediate(context, context.classInitCode);
-                    String field = context.newField(bridge.jsonClass());
-                    context.classInitCode.putstatic(context.clazz, field, bridge.jsonClass());
-                    context.processCode.getstatic(context.clazz, field, bridge.jsonClass());
-                    return null;
-                } finally {
-                    caching = false;
-                }
+            if (that.visit(new CheckCacheable())) {
+                // Cache whole object
+                compileToStaticInitializer.compileJsonObject(that.fields(), that.fields().size(), null, true);
+                cacheAndGet(bridge.jsonClass());
+                return null;
             }
 
-            if (!caching && bridge.cacheJsonObjectIntermediate()) {
-                Map<Boolean, List<Entry<JsonAST, JsonAST>>> fields =
+            String field = null;
+            List<Entry<JsonAST, JsonAST>> fields = that.fields();
+            if (bridge.cacheJsonObjectIntermediate()) {
+                Map<Boolean, List<Entry<JsonAST, JsonAST>>> biFields =
                         that.fields().stream()
                             .collect(Collectors.partitioningBy(
                                     e -> e.getKey().visit(new CheckCacheable())
                                          && e.getValue().visit(new CheckCacheable())));
-                List<Entry<JsonAST, JsonAST>> cacheableFields = fields.get(true);
+                List<Entry<JsonAST, JsonAST>> cacheableFields = biFields.get(true);
 
 
                 if (!cacheableFields.isEmpty()) {
-                    caching = true;
-                    String field;
-                    try {
-                        bridge.compileCreateJsonObjectIntermediate(context, context.classInitCode,
-                                                                   cacheableFields.size(), null);
-                        cacheableFields.forEach(e -> {
-                            context.classInitCode.dup();
-                            compileJsonObjectKey(e.getKey(), context.classInitCode);
-                            code = context.classInitCode;
-                            try {
-                                e.getValue().visit(this);
-                            } finally {
-                                code = context.processCode;
-                            }
-                            bridge.compilePutToJsonObjectIntermediate(context, context.classInitCode);
-                        });
+                    compileToStaticInitializer.compileJsonObject(cacheableFields, cacheableFields.size(), null, false);
 
-                        field = context.newField(bridge.jsonObjectIntermediateClass());
-                        context.classInitCode.putstatic(context.clazz, field,
-                                                        bridge.jsonObjectIntermediateClass());
-                    } finally {
-                        caching = false;
-                    }
-
-                    bridge.compileCreateJsonObjectIntermediate(context, context.processCode,
-                                                               that.fields().size(), field);
-                    fields.get(false).forEach(e -> {
-                        context.processCode.dup();
-                        compileJsonObjectKey(e.getKey(), context.processCode);
-                        e.getValue().visit(this);
-                        bridge.compilePutToJsonObjectIntermediate(context, context.processCode);
-                    });
-                    bridge.compileFinishJsonObjectIntermediate(context, context.processCode);
+                    field = cache(bridge.jsonObjectIntermediateClass());
+                    fields = biFields.get(false);
                 }
-
-                return null;
             }
 
-            bridge.compileCreateJsonObjectIntermediate(context, code, that.fields().size(), null);
-            that.fields().forEach(e -> {
-                code.dup();
-                compileJsonObjectKey(e.getKey(), code);
-                e.getValue().visit(this);
-                bridge.compilePutToJsonObjectIntermediate(context, code);
-            });
-            bridge.compileFinishJsonObjectIntermediate(context, code);
+            compileJsonObject(fields, fields.size(), field, true);
 
             return null;
         }
 
-        private void compileJsonObjectKey(JsonAST that, CodeBuilder code) {
+        @Override
+        public Void visitArray(JASTArray that) {
+            System.out.println(that);
+            if (that.visit(new CheckCacheable())) {
+                // Cache whole object
+                compileToStaticInitializer.compileJsonArray(that.values(), that.values().size(), null, true);
+                cacheAndGet(bridge.jsonClass());
+                return null;
+            }
+
+            String field = null;
+            List<JsonAST> values = that.values();
+
+            if (bridge.cacheJsonArrayIntermediate()) {
+                Map<Boolean, List<JsonAST>> biValues =
+                        that.values().stream()
+                            .collect(Collectors.partitioningBy(v -> v.visit(new CheckCacheable())));
+                List<JsonAST> cacheableValues = biValues.get(true);
+
+                if (!cacheableValues.isEmpty()) {
+                    compileToStaticInitializer.compileJsonArray(cacheableValues, cacheableValues.size(), null, false);
+
+                    field = cache(bridge.jsonArrayIntermediateClass());
+                    values = biValues.get(false);
+                }
+            }
+
+            compileJsonArray(values, values.size(), field, true);
+
+            return null;
+        }
+
+
+        @Override
+        public Void visitString(JASTString that) {
+            // When string.fragments is single
+            if (that.visit(new CheckCacheable()) && bridge.cacheString()) {
+                compileToStaticInitializer.visitString(that);
+
+                cacheAndGet(bridge.jsonClass());
+                return null;
+            }
+
+            return super.visitString(that);
+        }
+
+        @Override
+        public Void visitNumber(JASTNumberString that) {
+            // TODO cache
+            return super.visitNumber(that);
+        }
+
+        @Override
+        public Void visitNumber(JASTNumberNumber that) {
+            // TODO cache
+            return super.visitNumber(that);
+        }
+
+        @Override
+        public Void visitTrue(JASTTrue that) {
+            // TODO cache
+            return super.visitTrue(that);
+        }
+
+        @Override
+        public Void visitFalse(JASTFalse that) {
+            // TODO cache
+            return super.visitFalse(that);
+        }
+
+        @Override
+        public Void visitNull(JASTNull that) {
+            // TODO cache
+            return super.visitNull(that);
+        }
+    }
+
+    class CompileVisitor implements JsonVisitor<Void> {
+        protected final JsonCompilerV2Context context;
+        protected final CodeBuilder code;
+
+        public CompileVisitor(JsonCompilerV2Context context, CodeBuilder code) {
+            this.context = context;
+            this.code = code;
+        }
+
+        @Override
+        public Void visitObject(JASTObject that) {
+            compileJsonObject(that.fields(), that.fields().size(), null, true);
+            return null;
+        }
+
+        public void compileJsonObject(List<Entry<JsonAST, JsonAST>> fields, int size, String field, boolean finish) {
+            bridge.compileCreateJsonObjectIntermediate(context, code, size, field);
+            fields.forEach(e -> {
+                code.dup();
+                compileJsonObjectKey(e.getKey());
+                e.getValue().visit(this);
+                bridge.compilePutToJsonObjectIntermediate(context, code);
+            });
+
+            if (finish) {
+                bridge.compileFinishJsonObjectIntermediate(context, code);
+            }
+        }
+
+        private void compileJsonObjectKey(JsonAST that) {
             switch (that) {
-                case JASTString str -> compileStringTemplate(str, code);
+                case JASTString str -> compileStringTemplate(str);
                 case JASTJavaObject obj -> {
+                    code.aload(obj.pos().index())
+                            .checkcast(CD_String); // TODO Check CharSequence?
                     // TODO
                 }
                 default -> throw new IllegalStateException("Unexpected Json element in JsonObject key");
             }
         }
 
-        @Override
-        public Void visitArray(JASTArray that) {
-            if (!caching && that.visit(new CheckCacheable())) {
-                caching = true;
-                try {
-                    // Cache whole object
-                    bridge.compileCreateJsonArrayIntermediate(context, context.classInitCode,
-                                                               that.values().size(), null);
-                    that.values().forEach(v -> {
-                        context.classInitCode.dup();
-                        code = context.classInitCode;
-                        try {
-                            v.visit(this);
-                        } finally {
-                            code = context.processCode;
-                        }
-                        bridge.compilePutToJsonArrayIntermediate(context, context.classInitCode);
-                    });
-                    bridge.compileFinishJsonArrayIntermediate(context, context.classInitCode);
-                    String field = context.newField(bridge.jsonClass());
-                    context.classInitCode.putstatic(context.clazz, field, bridge.jsonClass());
-                    context.processCode.getstatic(context.clazz, field, bridge.jsonClass());
-                    return null;
-                } finally {
-                    caching = false;
-                }
-            }
-
-            if (!caching && bridge.cacheJsonArrayIntermediate()) {
-                Map<Boolean, List<JsonAST>> values =
-                        that.values().stream()
-                            .collect(Collectors.partitioningBy(v -> v.visit(new CheckCacheable())));
-                List<JsonAST> cacheableValues = values.get(true);
-
-                if (!cacheableValues.isEmpty()) {
-                    caching = true;
-                    String field;
-                    try {
-                        bridge.compileCreateJsonArrayIntermediate(context, context.classInitCode,
-                                                                  cacheableValues.size(), null);
-                        cacheableValues.forEach(v -> {
-                            context.classInitCode.dup();
-                            code = context.classInitCode;
-                            try {
-                                v.visit(this);
-                            } finally {
-                                code = context.processCode;
-                            }
-                            bridge.compilePutToJsonArrayIntermediate(context, context.classInitCode);
-                        });
-
-                        field = context.newField(bridge.jsonArrayIntermediateClass());
-                        context.classInitCode.putstatic(context.clazz, field,
-                                                        bridge.jsonArrayIntermediateClass());
-                    } finally {
-                        caching = false;
-                    }
-
-                    bridge.compileCreateJsonArrayIntermediate(context, context.processCode,
-                                                              that.values().size(), field);
-                    values.get(false).forEach(v -> {
-                        context.processCode.dup();
-                        v.visit(this);
-                        bridge.compilePutToJsonArrayIntermediate(context, context.processCode);
-                    });
-                    bridge.compileFinishJsonArrayIntermediate(context, context.processCode);
-
-                    return null;
-                }
-            }
-
-            bridge.compileCreateJsonObjectIntermediate(context, code, that.values().size(), null);
-            that.values().forEach(v -> {
-                code.dup();
-                v.visit(this);
-                bridge.compilePutToJsonArrayIntermediate(context, code);
-            });
-            bridge.compileFinishJsonArrayIntermediate(context, code);
-
-            return null;
-        }
-
-        private void compileStringTemplate(JASTString that, CodeBuilder code) {
+        private void compileStringTemplate(JASTString that) {
             if (that.fragments().size() == 1) {
                 code.ldc(context.classBuilder.constantPool().stringEntry(that.fragments().get(0)));
                 bridge.compileString(context, code);
@@ -326,55 +327,63 @@ public class JsonCompilerV2<T> {
         }
 
         @Override
-        public Void visitString(JASTString that) {
-            if (!caching && that.visit(new CheckCacheable())) {
-                if (bridge.cacheString()) {
-                    context.classInitCode.ldc(context.classBuilder.constantPool().stringEntry(that.fragments().get(0)));
-                    bridge.compileString(context, context.classInitCode);
-                    String field = context.newField(bridge.jsonClass());
-                    context.classInitCode.putstatic(context.clazz, field, bridge.jsonClass());
+        public Void visitArray(JASTArray that) {
+            compileJsonArray(that.values(), that.values().size(), null, true);
 
-                    context.processCode.getstatic(context.clazz, field, bridge.jsonClass());
-                    return null;
-                }
+            return null;
+        }
+
+        public void compileJsonArray(List<JsonAST> values, int size, String field, boolean finish) {
+            bridge.compileCreateJsonArrayIntermediate(context, code, size, field);
+            values.forEach(v -> {
+                code.dup();
+                v.visit(this);
+                bridge.compilePutToJsonArrayIntermediate(context, code);
+            });
+
+            if (finish) {
+                bridge.compileFinishJsonArrayIntermediate(context, code);
+            }
+        }
+
+        @Override
+        public Void visitString(JASTString that) {
+            if (that.fragments().size() == 1) {
+                code.ldc(context.classBuilder.constantPool().stringEntry(that.fragments().get(0)));
+            } else {
+                compileStringTemplate(that);
             }
 
-            compileStringTemplate(that, code);
             bridge.compileString(context, code);
             return null;
         }
 
         @Override
         public Void visitNumber(JASTNumberString that) {
-            // TODO cache
             bridge.compileNumber(context, code, that.number());
             return null;
         }
 
         @Override
         public Void visitNumber(JASTNumberNumber that) {
-            // TODO cache
             bridge.compileNumber(context, code, that.number());
             return null;
         }
 
         @Override
         public Void visitTrue(JASTTrue that) {
-            // TODO cache
             bridge.compileTrue(context, code);
             return null;
         }
 
         @Override
         public Void visitFalse(JASTFalse that) {
-            // TODO cache
             bridge.compileFalse(context, code);
             return null;
         }
 
         @Override
         public Void visitNull(JASTNull that) {
-            // TODO cache
             bridge.compileNull(context, code);
             return null;
         }
@@ -389,7 +398,7 @@ public class JsonCompilerV2<T> {
     /**
      * Cacheable true when elements are constant (no refer to value of StringTemplate) and it's immutable in JsonWorld
      */
-    class CheckCacheable implements JsonAST.JsonVisitor<Boolean> {
+    class CheckCacheable implements JsonVisitor<Boolean> {
 
         @Override
         public Boolean visitObject(JASTObject that) {
@@ -437,156 +446,6 @@ public class JsonCompilerV2<T> {
         @Override
         public Boolean visitJavaObject(JASTJavaObject that) {
             return false;
-        }
-    }
-
-    static class JavaJsonCompilerBridge implements JsonCompilerBridge<Object> {
-
-        public static void main(String[] args) throws IOException {
-            String name = "";
-//            StringTemplate template = RAW."'Hello \{name} world'";
-//            StringTemplate template = RAW."'Hello world'";
-            StringTemplate template = RAW."{'text': 'hello world'}";
-            JsonParserV2 parser = new JsonParserV2(new JsonTokenizer(template , JsonStringTemplateConfiguration.DEFAULT), JsonStringTemplateConfiguration.DEFAULT);
-            JsonAST ast = parser.parseJson();
-
-            JsonCompilerV2<Object> compiler = new JsonCompilerV2<>(new JavaJsonCompilerBridge());
-            compiler.compile(1, ast);
-        }
-
-        @Override
-        public ClassDesc jsonClass() {
-            return CD_Object;
-        }
-
-        @Override
-        public ClassDesc jsonObjectIntermediateClass() {
-            return CD_Map;
-        }
-
-        @Override
-        public ClassDesc jsonArrayIntermediateClass() {
-            return CD_List;
-        }
-
-        @Override
-        public void compileCreateJsonObjectIntermediate(JsonCompilerV2Context context, CodeBuilder code,
-                                                        int size, String field) {
-            code.new_(ClassDesc.of("java.util.HashMap"))
-                .dup()
-                .ldc(context.classBuilder.constantPool().intEntry(size))
-                .invokespecial(ClassDesc.of("java.util.HashMap"), ConstantDescs.INIT_NAME, MethodTypeDesc.of(CD_void, CD_int));
-
-            if (field != null) {
-                code.dup()
-                    .getstatic(context.clazz, field, jsonClass())
-                    .invokevirtual(CD_Map, "putAll", MethodTypeDesc.of(CD_void, CD_Map));
-            }
-        }
-
-        @Override
-        public void compilePutToJsonObjectIntermediate(JsonCompilerV2Context context, CodeBuilder code) {
-
-        }
-
-        @Override
-        public void compileFinishJsonObjectIntermediate(JsonCompilerV2Context context, CodeBuilder code) {
-
-        }
-
-        @Override
-        public boolean cacheJsonObjectIntermediate() {
-            return true;
-        }
-
-        @Override
-        public boolean isJsonObjectImmutable() {
-            return false;
-        }
-
-        @Override
-        public void compileCreateJsonArrayIntermediate(JsonCompilerV2Context context, CodeBuilder code,
-                                                       int size, String field) {
-
-        }
-
-        @Override
-        public void compilePutToJsonArrayIntermediate(JsonCompilerV2Context context, CodeBuilder code) {
-
-        }
-
-        @Override
-        public void compileFinishJsonArrayIntermediate(JsonCompilerV2Context context, CodeBuilder code) {
-
-        }
-
-        @Override
-        public boolean cacheJsonArrayIntermediate() {
-            return true;
-        }
-
-        @Override
-        public boolean isJsonArrayImmutable() {
-            return false;
-        }
-
-        @Override
-        public void compileString(JsonCompilerV2Context context, CodeBuilder code) {
-        }
-
-        @Override
-        public boolean isStringImmutable() {
-            return true;
-        }
-
-        @Override
-        public boolean cacheString() {
-            return false;
-        }
-
-        @Override
-        public void compileNumber(JsonCompilerV2Context context, CodeBuilder code, String number) {
-            JsonCompilerBridge.super.compileNumber(context, code, number);
-        }
-
-        @Override
-        public boolean isNumberImmutable() {
-            return true;
-        }
-
-        @Override
-        public void compileTrue(JsonCompilerV2Context context, CodeBuilder code) {
-            code.getstatic(CD_Boolean, "TRUE", CD_Boolean);
-        }
-
-        @Override
-        public boolean isTrueImmutable() {
-            return true;
-        }
-
-        @Override
-        public void compileFalse(JsonCompilerV2Context context, CodeBuilder code) {
-            code.getstatic(CD_Boolean, "FALSE", CD_Boolean);
-        }
-
-        @Override
-        public boolean isFalseImmutable() {
-            return true;
-        }
-
-        @Override
-        public void compileNull(JsonCompilerV2Context context, CodeBuilder code) {
-            code.aconst_null();
-        }
-
-        @Override
-        public boolean isNullImmutable() {
-            return true;
-        }
-
-        @Override
-        public void compileJavaObject(JsonCompilerV2Context context, CodeBuilder processCode, int argPos) {
-            processCode.aload(processCode.parameterSlot(argPos));
         }
     }
 
